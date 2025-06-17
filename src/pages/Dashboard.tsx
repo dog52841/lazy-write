@@ -1,18 +1,36 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import TextInput from "@/components/TextInput";
 import StyleSelector from "@/components/StyleSelector";
 import HandwritingPreview from "@/components/HandwritingPreview";
 import GenerationStatus from "@/components/GenerationStatus";
+import AdBanner from "@/components/AdBanner";
+import { handwritingService } from "@/services/handwritingService";
 
 const Dashboard = () => {
   const [prompt, setPrompt] = useState("");
   const [style, setStyle] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationsLeft, setGenerationsLeft] = useState(2);
+  const [bonusGenerations, setBonusGenerations] = useState(0);
+  const [showAd, setShowAd] = useState(true);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  
   const maxGenerations = 3;
+  const totalGenerations = generationsLeft + bonusGenerations;
+
+  const handleWatchAd = useCallback(() => {
+    toast.info("Opening ad...");
+    
+    // Simulate ad watching
+    setTimeout(() => {
+      setBonusGenerations(prev => prev + 2);
+      setShowAd(false);
+      toast.success("Great! You earned 2 bonus generations! 🎉");
+    }, 3000);
+  }, []);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -25,37 +43,50 @@ const Dashboard = () => {
       return;
     }
 
-    if (generationsLeft <= 0) {
-      toast.error("You've reached your daily generation limit. Upgrade to Premium for unlimited generations!");
+    if (totalGenerations <= 0) {
+      toast.error("You've reached your daily generation limit. Watch an ad for bonus generations or upgrade to Premium!");
+      setShowAd(true);
       return;
     }
 
     setIsGenerating(true);
     
     try {
-      // Simulate AI generation process
-      toast.info("Analyzing your text...");
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Use the new handwriting service following the AI setup
+      toast.info("🤖 Analyzing your text with AI...");
       
-      toast.info("Generating handwriting style...");
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const result = await handwritingService.generateHandwriting({
+        text: prompt,
+        style: style,
+        background: 'lined'
+      });
       
-      toast.info("Rendering final image...");
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update generations count
-      setGenerationsLeft(prev => Math.max(0, prev - 1));
-      
-      toast.success("Handwriting generated successfully! ✍️");
+      if (result.success) {
+        setGeneratedImage(result.imageUrl);
+        
+        // Deduct from bonus first, then regular generations
+        if (bonusGenerations > 0) {
+          setBonusGenerations(prev => Math.max(0, prev - 1));
+        } else {
+          setGenerationsLeft(prev => Math.max(0, prev - 1));
+        }
+        
+        toast.success(`Handwriting generated successfully in ${(result.processingTime / 1000).toFixed(1)}s! ✍️`);
+        
+        // Show ad after every 2nd generation for free users
+        if ((maxGenerations - generationsLeft + 1) % 2 === 0 && totalGenerations > 1) {
+          setTimeout(() => setShowAd(true), 2000);
+        }
+      } else {
+        toast.error("Failed to generate handwriting. Please try again.");
+      }
     } catch (error) {
+      console.error('Generation error:', error);
       toast.error("Failed to generate handwriting. Please try again.");
     } finally {
       setIsGenerating(false);
     }
   };
-
-  const lineCount = prompt.split('\n').length;
-  const isOverLimit = lineCount > 10;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50">
@@ -72,11 +103,20 @@ const Dashboard = () => {
           </p>
         </div>
 
+        {/* Ad Banner for Free Users */}
+        {showAd && totalGenerations <= 1 && (
+          <AdBanner 
+            onWatchAd={handleWatchAd}
+            onClose={() => setShowAd(false)}
+          />
+        )}
+
         {/* Generation Status */}
         <div className="mb-8">
           <GenerationStatus 
-            generationsLeft={generationsLeft}
+            generationsLeft={totalGenerations}
             maxGenerations={maxGenerations}
+            bonusGenerations={bonusGenerations}
           />
         </div>
 
@@ -102,6 +142,8 @@ const Dashboard = () => {
               style={style}
               onGenerate={handleGenerate}
               isGenerating={isGenerating}
+              generatedImage={generatedImage}
+              onImageChange={setGeneratedImage}
             />
           </div>
         </div>

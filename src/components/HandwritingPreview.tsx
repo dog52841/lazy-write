@@ -1,20 +1,26 @@
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Download, Upload, RotateCcw } from "lucide-react";
+import { Sparkles, Download, RotateCcw } from "lucide-react";
 
 interface HandwritingPreviewProps {
   text: string;
   style: string;
   onGenerate: () => void;
   isGenerating: boolean;
+  generatedImage?: string | null;
+  onImageChange?: (image: string | null) => void;
 }
 
-const HandwritingPreview = ({ text, style, onGenerate, isGenerating }: HandwritingPreviewProps) => {
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-
+const HandwritingPreview = ({ 
+  text, 
+  style, 
+  onGenerate, 
+  isGenerating, 
+  generatedImage,
+  onImageChange 
+}: HandwritingPreviewProps) => {
   const handleDownload = () => {
     if (generatedImage) {
       const link = document.createElement('a');
@@ -22,6 +28,10 @@ const HandwritingPreview = ({ text, style, onGenerate, isGenerating }: Handwriti
       link.download = 'handwriting.png';
       link.click();
     }
+  };
+
+  const handleReset = () => {
+    onImageChange?.(null);
   };
 
   const getStyleFont = (style: string) => {
@@ -123,7 +133,7 @@ const HandwritingPreview = ({ text, style, onGenerate, isGenerating }: Handwriti
                   Download
                 </Button>
                 <Button 
-                  onClick={() => setGeneratedImage(null)}
+                  onClick={handleReset}
                   variant="outline" 
                   className="border-gray-200 text-gray-600 hover:bg-gray-50"
                 >
