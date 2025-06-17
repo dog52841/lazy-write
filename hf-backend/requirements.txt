@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+torch
+diffusers
+transformers
+accelerate
+ip-adapter
+scikit-learn
+numpy
+Pillow
+einops
+python-multipart 
