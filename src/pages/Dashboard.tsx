@@ -1,132 +1,126 @@
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { PenTool, LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useHandwritingData } from "@/hooks/useHandwritingData";
+import { handwritingService } from "@/services/handwritingService";
 import { toast } from "sonner";
-import Navbar from "@/components/Navbar";
+
 import TextInput from "@/components/TextInput";
 import StyleSelector from "@/components/StyleSelector";
 import HandwritingPreview from "@/components/HandwritingPreview";
 import GenerationStatus from "@/components/GenerationStatus";
 import AdBanner from "@/components/AdBanner";
-import { handwritingService } from "@/services/handwritingService";
 
 const Dashboard = () => {
-  const [prompt, setPrompt] = useState("");
+  const { user, signOut } = useAuth();
+  const { 
+    generationsLeft, 
+    bonusGenerations, 
+    saveSample, 
+    addBonusGenerations 
+  } = useHandwritingData();
+  
+  const [text, setText] = useState("");
   const [style, setStyle] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generationsLeft, setGenerationsLeft] = useState(2);
-  const [bonusGenerations, setBonusGenerations] = useState(0);
-  const [showAd, setShowAd] = useState(true);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  
-  const maxGenerations = 3;
+  const [showAdBanner, setShowAdBanner] = useState(true);
+
+  const maxLines = 15;
   const totalGenerations = generationsLeft + bonusGenerations;
 
-  const handleWatchAd = useCallback(() => {
-    toast.info("Opening ad...");
-    
-    // Simulate ad watching
-    setTimeout(() => {
-      setBonusGenerations(prev => prev + 2);
-      setShowAd(false);
-      toast.success("Great! You earned 2 bonus generations! 🎉");
-    }, 3000);
-  }, []);
-
   const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      toast.error("Please enter some text to generate handwriting!");
-      return;
-    }
-    
-    if (!style) {
-      toast.error("Please select a handwriting style!");
-      return;
-    }
-
-    if (totalGenerations <= 0) {
-      toast.error("You've reached your daily generation limit. Watch an ad for bonus generations or upgrade to Premium!");
-      setShowAd(true);
-      return;
-    }
+    if (!text.trim() || !style || totalGenerations === 0) return;
 
     setIsGenerating(true);
-    
     try {
-      // Use the new handwriting service following the AI setup
-      toast.info("🤖 Analyzing your text with AI...");
-      
       const result = await handwritingService.generateHandwriting({
-        text: prompt,
+        text: text.trim(),
         style: style,
         background: 'lined'
       });
-      
-      if (result.success) {
+
+      if (result.success && result.imageUrl) {
         setGeneratedImage(result.imageUrl);
-        
-        // Deduct from bonus first, then regular generations
-        if (bonusGenerations > 0) {
-          setBonusGenerations(prev => Math.max(0, prev - 1));
-        } else {
-          setGenerationsLeft(prev => Math.max(0, prev - 1));
-        }
-        
-        toast.success(`Handwriting generated successfully in ${(result.processingTime / 1000).toFixed(1)}s! ✍️`);
-        
-        // Show ad after every 2nd generation for free users
-        if ((maxGenerations - generationsLeft + 1) % 2 === 0 && totalGenerations > 1) {
-          setTimeout(() => setShowAd(true), 2000);
-        }
+        // Save to database
+        await saveSample(text.trim(), style, result.imageUrl);
+        toast.success(`Generated in ${(result.processingTime / 1000).toFixed(1)}s!`);
       } else {
-        toast.error("Failed to generate handwriting. Please try again.");
+        toast.error('Failed to generate handwriting. Please try again.');
       }
     } catch (error) {
       console.error('Generation error:', error);
-      toast.error("Failed to generate handwriting. Please try again.");
+      toast.error('Something went wrong. Please try again.');
     } finally {
       setIsGenerating(false);
     }
   };
 
+  const handleWatchAd = () => {
+    addBonusGenerations(2);
+    setShowAdBanner(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success('Signed out successfully');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50">
-      <Navbar />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="font-quicksand text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-3">
-            Create Beautiful Handwriting
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Transform your text into authentic-looking handwritten notes with our AI-powered handwriting generator
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+      {/* Header */}
+      <header className="bg-white/90 backdrop-blur-sm border-b border-orange-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link to="/" className="flex items-center space-x-2">
+              <PenTool className="h-8 w-8 text-orange-500" />
+              <span className="font-quicksand font-bold text-xl text-gray-900">LazyWrite</span>
+            </Link>
+            
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">
+                Welcome, {user?.user_metadata?.full_name || user?.email}!
+              </span>
+              <Button
+                onClick={handleSignOut}
+                variant="outline"
+                size="sm"
+                className="border-orange-200 text-gray-600 hover:bg-orange-50"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
+          </div>
         </div>
+      </header>
 
-        {/* Ad Banner for Free Users */}
-        {showAd && totalGenerations <= 1 && (
-          <AdBanner 
-            onWatchAd={handleWatchAd}
-            onClose={() => setShowAd(false)}
-          />
-        )}
-
-        {/* Generation Status */}
-        <div className="mb-8">
-          <GenerationStatus 
-            generationsLeft={totalGenerations}
-            maxGenerations={maxGenerations}
-            bonusGenerations={bonusGenerations}
-          />
-        </div>
-
-        <div className="grid xl:grid-cols-2 gap-8">
-          {/* Input Section */}
-          <div className="space-y-6">
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Input & Settings */}
+          <div className="lg:col-span-1 space-y-6">
+            <GenerationStatus
+              generationsLeft={generationsLeft}
+              maxGenerations={5}
+              bonusGenerations={bonusGenerations}
+              isPremium={false}
+            />
+            
+            {showAdBanner && totalGenerations < 3 && (
+              <AdBanner
+                onWatchAd={handleWatchAd}
+                onClose={() => setShowAdBanner(false)}
+              />
+            )}
+            
             <TextInput
-              value={prompt}
-              onChange={setPrompt}
-              maxLines={10}
+              value={text}
+              onChange={setText}
+              maxLines={maxLines}
             />
             
             <StyleSelector
@@ -134,11 +128,11 @@ const Dashboard = () => {
               onChange={setStyle}
             />
           </div>
-
-          {/* Preview Section */}
-          <div>
+          
+          {/* Right Column - Preview */}
+          <div className="lg:col-span-2">
             <HandwritingPreview
-              text={prompt}
+              text={text}
               style={style}
               onGenerate={handleGenerate}
               isGenerating={isGenerating}
@@ -147,7 +141,7 @@ const Dashboard = () => {
             />
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
