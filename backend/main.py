@@ -10,6 +10,7 @@ import stripe
 import httpx
 import time
 from PIL import Image
+import replicate
 
 # --- AI Style Analysis Model ---
 # This small model can run on the free tier CPU to analyze handwriting styles.
@@ -190,7 +191,7 @@ async def generate_handwriting(
     is_premium: bool = Form(False)
 ):
     """
-    Loads a user's style profile, calls the external Hugging Face AI service to generate
+    Loads a user's style profile, calls a serverless GPU on Replicate to generate
     an image, saves it to the persistent disk, and returns a public URL.
     """
     request_id = uuid.uuid4()
@@ -209,38 +210,42 @@ async def generate_handwriting(
         print(f"[{request_id}] Failed to load profile from disk: {e}")
         raise HTTPException(status_code=500, detail=f"Could not load style profile: {e}")
 
-    # --- 2. Call the Hugging Face AI Service ---
-    hf_space_url = os.environ.get("HF_SPACE_URL")
-    if not hf_space_url:
-        print(f"[{request_id}] FATAL_ERROR: HF_SPACE_URL environment variable is not set.")
+    # --- 2. Call the Replicate AI Service ---
+    replicate_model_version = os.environ.get("REPLICATE_MODEL_VERSION")
+    if not replicate_model_version:
+        print(f"[{request_id}] FATAL_ERROR: REPLICATE_MODEL_VERSION environment variable is not set.")
         raise HTTPException(status_code=500, detail="AI service is not configured.")
 
-    generation_payload = {
+    input_data = {
         "style_profile": style_profile,
         "prompt": prompt,
         "is_premium": is_premium
     }
     
     try:
-        print(f"[{request_id}] Calling Hugging Face AI service at: {hf_space_url}")
-        # Use a longer timeout to account for the model's cold start and CPU generation time
-        async with httpx.AsyncClient(timeout=300.0) as client:
-            response = await client.post(f"{hf_space_url}/generate", json=generation_payload)
+        print(f"[{request_id}] Calling Replicate model: {replicate_model_version}")
         
-        response.raise_for_status() # Raise an exception for 4xx or 5xx status codes
+        # This call authenticates using the REPLICATE_API_TOKEN env var
+        # and runs the model on Replicate's servers.
+        image_output_url = replicate.run(replicate_model_version, input=input_data)
         
-        # The response should be the raw image data
+        print(f"[{request_id}] Replicate returned image URL: {image_output_url}")
+
+        # --- 3. Download the Generated Image ---
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.get(image_output_url)
+        response.raise_for_status()
         image_data = response.content
-        print(f"[{request_id}] Successfully received generated image from AI service.")
+        print(f"[{request_id}] Successfully downloaded generated image.")
 
+    except replicate.exceptions.ReplicateError as e:
+        print(f"[{request_id}] Replicate API error: {e}")
+        raise HTTPException(status_code=502, detail=f"AI service failed: {e}")
     except httpx.HTTPStatusError as e:
-        print(f"[{request_id}] AI service returned an error: {e.response.status_code} - {e.response.text}")
-        raise HTTPException(status_code=502, detail=f"AI service failed: {e.response.text}")
-    except httpx.RequestError as e:
-        print(f"[{request_id}] Could not connect to AI service: {e}")
-        raise HTTPException(status_code=503, detail=f"Could not connect to the AI generation service: {e}")
+        print(f"[{request_id}] Failed to download image from Replicate: {e}")
+        raise HTTPException(status_code=502, detail=f"Could not retrieve generated image: {e}")
 
-    # --- 3. Save the Image and Return URL ---
+    # --- 4. Save the Image and Return URL ---
     timestamp = int(time.time())
     filename = f"{user_id}_generated_{timestamp}.png"
     image_path = os.path.join(GENERATED_IMAGES_DIR, filename)

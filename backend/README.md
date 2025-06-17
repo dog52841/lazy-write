@@ -1,41 +1,49 @@
-# LazyWrite Deployment Guide
+# LazyWrite Final Deployment Guide (Replicate + Render)
 
-This guide will walk you through deploying the entire LazyWrite application. The architecture is split into two main services to keep costs at **$0/month**:
+This guide walks you through deploying the entire LazyWrite application. The architecture is split into two services for maximum performance and cost-efficiency:
 
-1.  **Main Backend (on Render):** A lightweight service for user management, payments, and file storage. Runs on a **Free Tier** plan.
-2.  **AI Backend (on Hugging Face):** A powerful service that runs the large AI models for image generation. Runs on a **Free** community Space.
+1.  **AI Backend (on Replicate):** A powerful, serverless GPU service that runs the large AI model for fast image generation. You only pay for the seconds the model is running, and you get a generous free tier.
+2.  **Main Backend (on Render):** A lightweight service for user management, payments, and file storage. Runs on a **Free Tier** plan.
 
 ---
 
-## Part 1: Deploy the AI Backend to Hugging Face Spaces
+## Part 1: Deploy the AI Backend to Replicate
 
-First, we'll deploy the AI factory.
+First, we'll deploy the GPU-powered AI model.
 
-### 1. Create a Hugging Face Account
-- If you don't have one, sign up at [huggingface.co](https://huggingface.co).
+### 1. Install `cog`
+`cog` is Replicate's command-line tool for packaging and deploying models. Install it on your local machine:
+```bash
+sudo curl -o /usr/local/bin/cog -L "https://github.com/replicate/cog/releases/latest/download/cog_$(uname -s)_$(uname -m)"
+sudo chmod +x /usr/local/bin/cog
+```
+*(For Windows, you may need to use WSL or another method.)*
 
-### 2. Create a New Space
-- In the top menu, click **"Spaces"** and then **"Create new Space"**.
-- **Owner:** Select yourself.
-- **Space name:** `lazywrite-ai-service` (or a name of your choice).
-- **License:** `mit`
-- **Select the Space SDK:** Choose **"Docker"** and then **"Choose a file"**. This will let you configure it manually. *Even though we are not using a full Dockerfile, this setup gives us the most control.*
-- **Space hardware:** Select the **"CPU basic - FREE"** option. This gives you 16GB of RAM.
-- Click **"Create Space"**.
+### 2. Create a Replicate Account & Get API Token
+- Sign up at [replicate.com](https://replicate.com).
+- Go to your **Account Settings** and find your API token.
+- Log in to Replicate on your command line:
+  ```bash
+  cog login
+  ```
+  Paste your API token when prompted.
 
-### 3. Upload Your AI Backend Files
-- Your new Space is essentially a Git repository.
-- Go to the **"Files and versions"** tab in your Space.
-- Click **"Add file"** and then **"Upload files"**.
-- Upload the two files from your local `hf-backend` directory:
-    - `app.py`
-    - `requirements.txt`
-- This will trigger the build process. You can view the logs in the **"Logs"** tab. It will take a while (15-30 minutes) to install all the libraries for the first time.
+### 3. Push the Model to Replicate
+- Open your terminal and navigate into the `replicate-backend` directory:
+  ```bash
+  cd replicate-backend
+  ```
+- Push the model. Replace `[your-username]` with your Replicate username.
+  ```bash
+  cog push r8.im/[your-username]/lazywrite-ai
+  ```
+- This will take a long time (20-40 minutes) as it uploads and builds the large AI model in a container. You can monitor the progress in your terminal.
 
-### 4. Get Your Space URL
-- Once the build is successful and the app is running, your Space will have a public URL like:
-  `https://[your-username]-lazywrite-ai-service.hf.space`
-- **Copy this URL.** You will need it for the next part.
+### 4. Get Your Model Version
+- Once the push is complete, go to your model's page on the Replicate dashboard.
+- Go to the **"Versions"** tab.
+- You will see a long string of characters. This is your unique **Model Version ID**.
+- **Copy this ID.** You will need it for the next part.
 
 ---
 
@@ -70,7 +78,8 @@ Now, we'll deploy the main application server.
 - **Add Environment Variables**:
     - **Key:** `PYTHON_VERSION`, **Value:** `3.9.18`
     - **Key:** `RENDER_DATA_DIR`, **Value:** `/var/data/lazywrite`
-    - **Key:** `HF_SPACE_URL`, **Value:** (Paste the URL of your Hugging Face Space here).
+    - **Key:** `REPLICATE_API_TOKEN`, **Value:** (Paste your Replicate API Token here).
+    - **Key:** `REPLICATE_MODEL_VERSION`, **Value:** (Paste the Model Version ID you copied from Replicate).
 
 ### 5. Deploy
 - Click **"Create Web Service"**.
@@ -84,4 +93,4 @@ Now, we'll deploy the main application server.
 2.  **Update `.env.local`:** In your local frontend code, open `src/.env.local` and set `VITE_API_URL` to your new Render URL.
 3.  **Deploy:** Push your updated frontend code to GitHub and deploy it on a service like Vercel or Netlify.
 
-**Congratulations! Your entire application is now deployed and running for free.** 
+**Congratulations! Your application is now deployed on a professional, high-performance, and cost-effective architecture.** 
