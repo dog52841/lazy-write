@@ -1,11 +1,63 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
-import { Check, Crown, Sparkles, Star } from "lucide-react";
+import { Check, Crown, Sparkles, Star, Zap } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useStripe } from "@stripe/react-stripe-js";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const Pricing = () => {
+  const { user } = useAuth();
+  const stripe = useStripe();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Your Stripe Price ID
+  const premiumPriceId = "price_1R4MxTSDoDaxuZtEXJ4OxFGE";
+
+  const handleCheckout = async () => {
+    if (!user) {
+      toast.error("You must be logged in to upgrade.");
+      return;
+    }
+    if (!stripe) {
+      toast.error("Payment system is not ready. Please try again in a moment.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("user_id", user.id);
+      formData.append("price_id", premiumPriceId);
+      
+      const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      
+      const res = await fetch(`${VITE_API_URL}/api/create-checkout-session`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create checkout session.");
+      }
+
+      const { sessionId } = await res.json();
+      
+      const { error } = await stripe.redirectToCheckout({ sessionId });
+
+      if (error) {
+        toast.error(error.message);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
       <Navbar />
@@ -118,8 +170,8 @@ const Pricing = () => {
                 </div>
               </div>
               
-              <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white mt-6">
-                Upgrade to Premium
+              <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white mt-6" onClick={handleCheckout} disabled={isLoading}>
+                {isLoading ? "Redirecting..." : "Upgrade to Premium"}
               </Button>
             </CardContent>
           </Card>
