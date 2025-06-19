@@ -58,7 +58,7 @@ const Index = () => {
             transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
             className="text-3xl md:text-4xl text-foreground/90 mb-4 font-medium relative z-10"
           >
-            Handwriting so real, even your teacher can't tell.
+            Handwriting so real, even your teacher can&apos;t tell.
           </motion.p>
           
           <motion.p 
@@ -133,7 +133,9 @@ const Index = () => {
           
           <div className="bg-white rounded-2xl p-8 md:p-12 shadow-inner border border-gray-200 notebook-lines relative overflow-hidden">
             {/* Paper texture overlay */}
-            <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23000000" fill-opacity="0.1"%3E%3Ccircle cx="7" cy="7" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+            <div className="absolute inset-0 opacity-5" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+            }}></div>
             
             <div className="space-y-8 text-2xl md:text-3xl text-gray-800 font-handwriting leading-relaxed relative z-10">
               <motion.div
@@ -163,7 +165,7 @@ const Index = () => {
                 viewport={{ once: true }}
                 className="pl-8"
               >
-                I'm looking forward to continuing this journey of learning 
+                I&apos;m looking forward to continuing this journey of learning 
                 with your guidance in the coming weeks.
               </motion.div>
               <motion.div
@@ -272,7 +274,7 @@ const Index = () => {
           </p>
           <Link to="/app" onClick={playClickSound}>
             <Button size="lg" className="px-12 py-6 text-xl font-semibold group bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-xl hover:shadow-2xl transition-all duration-300">
-              Start Creating Now - It's Free!
+              Start Creating Now - It&apos;s Free!
               <MoveRight className="h-6 w-6 ml-3 transition-transform duration-300 group-hover:translate-x-2" />
             </Button>
           </Link>
