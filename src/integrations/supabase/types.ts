@@ -42,8 +42,6 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
-          stripe_customer_id: string | null
-          subscription_tier: string | null
           updated_at: string
           username: string | null
         }
@@ -52,8 +50,6 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
-          stripe_customer_id?: string | null
-          subscription_tier?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -62,37 +58,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
-          stripe_customer_id?: string | null
-          subscription_tier?: string | null
           updated_at?: string
           username?: string | null
-        }
-        Relationships: []
-      }
-      user_generations: {
-        Row: {
-          count: number | null
-          created_at: string | null
-          date: string
-          id: number
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          count?: number | null
-          created_at?: string | null
-          date: string
-          id?: number
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          count?: number | null
-          created_at?: string | null
-          date?: string
-          id?: number
-          updated_at?: string | null
-          user_id?: string | null
         }
         Relationships: []
       }

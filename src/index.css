@@ -3,31 +3,43 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google Fonts - Handwriting & Print Styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Kalam:wght@300;400;700&family=Architects+Daughter&family=Indie+Flower&family=Shadows+Into+Light&family=Permanent+Marker&family=Covered+By+Your+Grace&family=Amatic+SC:wght@400;700&family=Comic+Neue:wght@300;400;700&family=Handlee&family=Schoolbell&family=Satisfy&family=Great+Vibes&family=Allura&family=Alex+Brush&family=Pinyon+Script&family=Sacramento&family=Tangerine:wght@400;700&family=Kaushan+Script&family=Marck+Script&family=Mr+Dafoe&family=Yellowtail&family=Pacifico&family=Lobster&family=Courgette&family=Righteous&family=Fredoka+One&family=Bungee&family=Orbitron:wght@400;700&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap');
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */
 
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --foreground: 222.2 84% 4.9%;
+
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 222.2 84% 4.9%;
+
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 20.5 90.2% 48.2%;
-    --primary-foreground: 60 9.1% 97.8%;
-    --secondary: 60 4.8% 95.9%;
-    --secondary-foreground: 0 0% 3.9%;
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5.3% 44.7%;
-    --accent: 60 4.8% 95.9%;
-    --accent-foreground: 0 0% 3.9%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 20.5 90.2% 48.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
     --radius: 0.5rem;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -39,25 +51,33 @@
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 20.5 90.2% 48.2%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 20.5 90.2% 48.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -73,60 +93,63 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
-  .font-display {
-    font-family: 'Playfair Display', Georgia, serif;
+
+  .font-quicksand {
+    font-family: 'Quicksand', sans-serif;
   }
+
   .font-handwriting {
-    font-family: 'Brush Script MT', cursive;
+    font-family: 'Georgia', 'Times New Roman', serif;
     font-style: italic;
     letter-spacing: 0.5px;
   }
-
-  /* Handwriting Fonts */
-  .font-caveat { font-family: 'Caveat', cursive; }
-  .font-dancing-script { font-family: 'Dancing Script', cursive; }
-  .font-kalam { font-family: 'Kalam', cursive; }
-  .font-architects-daughter { font-family: 'Architects Daughter', cursive; }
-  .font-indie-flower { font-family: 'Indie Flower', cursive; }
-  .font-shadows-into-light { font-family: 'Shadows Into Light', cursive; }
-  .font-permanent-marker { font-family: 'Permanent Marker', cursive; }
-  .font-covered-by-your-grace { font-family: 'Covered By Your Grace', cursive; }
-  .font-amatic-sc { font-family: 'Amatic SC', cursive; }
-  .font-comic-neue { font-family: 'Comic Neue', cursive; }
-  .font-handlee { font-family: 'Handlee', cursive; }
-  .font-schoolbell { font-family: 'Schoolbell', cursive; }
-  .font-satisfy { font-family: 'Satisfy', cursive; }
-  .font-great-vibes { font-family: 'Great Vibes', cursive; }
-  .font-allura { font-family: 'Allura', cursive; }
-  .font-alex-brush { font-family: 'Alex Brush', cursive; }
-  .font-pinyon-script { font-family: 'Pinyon Script', cursive; }
-  .font-sacramento { font-family: 'Sacramento', cursive; }
-  .font-tangerine { font-family: 'Tangerine', cursive; }
-  .font-kaushan-script { font-family: 'Kaushan Script', cursive; }
-  .font-marck-script { font-family: 'Marck Script', cursive; }
-  .font-mr-dafoe { font-family: 'Mr Dafoe', cursive; }
-  .font-yellowtail { font-family: 'Yellowtail', cursive; }
-  .font-pacifico { font-family: 'Pacifico', cursive; }
-  .font-lobster { font-family: 'Lobster', cursive; }
-  .font-courgette { font-family: 'Courgette', cursive; }
-  .font-righteous { font-family: 'Righteous', cursive; }
-  .font-fredoka-one { font-family: 'Fredoka One', cursive; }
-  .font-bungee { font-family: 'Bungee', cursive; }
-  .font-orbitron { font-family: 'Orbitron', sans-serif; }
-  .font-rajdhani { font-family: 'Rajdhani', sans-serif; }
-  .font-exo-2 { font-family: 'Exo 2', sans-serif; }
 }
 
+/* Custom animations and effects */
 @layer utilities {
-  .bg-grid-gray-100 {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(156 163 175 / 0.2)'%3e%3cpath d='m0 .5h32m-32 32v-32'/%3e%3c/svg%3e");
+  .glass-effect {
+    @apply bg-white/90 backdrop-blur-sm border border-white/20;
+  }
+  
+  .paper-texture {
+    background-image: 
+      linear-gradient(90deg, transparent 79px, #e2e8f0 79px, #e2e8f0 81px, transparent 81px),
+      linear-gradient(#fafafa .1em, transparent .1em);
+    background-size: 100% 1.2em;
+  }
+  
+  .notebook-lines {
+    background-image: repeating-linear-gradient(
+      transparent,
+      transparent 23px,
+      #e2e8f0 23px,
+      #e2e8f0 24px
+    );
   }
 }
 
-html {
-  scroll-behavior: smooth;
+/* Enhanced animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
 }

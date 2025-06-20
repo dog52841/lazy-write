@@ -3,213 +3,174 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
-import { Check, Crown, Sparkles, IndianRupee, ArrowRight } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useStripe } from "@stripe/react-stripe-js";
-import { useState } from "react";
-import { toast } from "sonner";
+import { Check, Crown, Sparkles, Star } from "lucide-react";
 
 const Pricing = () => {
-  const { user } = useAuth();
-  const stripe = useStripe();
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Real Stripe Price ID from your secrets
-  const premiumPriceId = "price_1R4MxTSDoDaxuZtEXJ4OxFGE";
-
-  const handleCheckout = async () => {
-    if (!user) {
-      toast.error("Please sign in to upgrade to Premium.");
-      return;
-    }
-    if (!stripe) {
-      toast.error("Payment system is not ready. Please try again.");
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append("user_id", user.id);
-      formData.append("price_id", premiumPriceId);
-      
-      const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      
-      const res = await fetch(`${VITE_API_URL}/api/create-checkout-session`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to create checkout session");
-      }
-
-      const { sessionId } = await res.json();
-      
-      const { error } = await stripe.redirectToCheckout({ sessionId });
-
-      if (error) {
-        toast.error(error.message);
-      }
-    } catch (err: any) {
-      toast.error(err.message || "An error occurred. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
       <Navbar />
       
-      <div className="py-24 sm:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          {/* Header */}
-          <div className="mx-auto max-w-4xl text-center">
-            <h2 className="text-base font-semibold leading-7 text-orange-600">Pricing</h2>
-            <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-              Choose the right plan for you
-            </p>
-            <p className="mt-6 text-lg leading-8 text-gray-600">
-              Start for free or unlock unlimited potential with Premium
-            </p>
-          </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="font-quicksand text-5xl font-bold text-gray-900 mb-4">
+            Simple, Transparent Pricing
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Start free and upgrade when you need more. No hidden fees, no surprises.
+          </p>
+        </div>
 
-          {/* Pricing Cards */}
-          <div className="isolate mx-auto mt-16 grid max-w-md grid-cols-1 gap-y-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-            {/* Free Plan */}
-            <div className="rounded-3xl p-8 ring-1 ring-gray-200 xl:p-10">
-              <div className="flex items-center justify-between gap-x-4">
-                <h3 className="text-lg font-semibold leading-8 text-gray-900">Free</h3>
-                <div className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold leading-5 text-gray-600">
-                  Most popular
-                </div>
+        {/* Pricing Cards */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* Free Plan */}
+          <Card className="bg-white/90 backdrop-blur-sm border-orange-100 shadow-lg">
+            <CardHeader className="text-center">
+              <div className="bg-gray-100 rounded-full p-3 w-fit mx-auto mb-4">
+                <Sparkles className="h-8 w-8 text-gray-600" />
               </div>
-              <p className="mt-4 text-sm leading-6 text-gray-600">
+              <CardTitle className="font-quicksand text-2xl text-gray-900">Free</CardTitle>
+              <CardDescription className="text-gray-600">
                 Perfect for trying out LazyWrite
-              </p>
-              <p className="mt-6 flex items-baseline gap-x-1">
-                <span className="text-4xl font-bold tracking-tight text-gray-900">₹0</span>
-                <span className="text-sm font-semibold leading-6 text-gray-600">/month</span>
-              </p>
-              
-              <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-600">
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  3 generations per day
-                </li>
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  5 handwriting styles
-                </li>
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  Basic paper backgrounds
-                </li>
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  PNG downloads
-                </li>
-              </ul>
-              
-              <Button
-                variant="outline"
-                className="mt-8 w-full"
-                disabled
-              >
-                Current plan
-              </Button>
-            </div>
-
-            {/* Premium Plan */}
-            <div className="rounded-3xl p-8 ring-2 ring-orange-600 xl:p-10">
-              <div className="flex items-center justify-between gap-x-4">
-                <h3 className="text-lg font-semibold leading-8 text-orange-600">Premium</h3>
-                <div className="rounded-full bg-orange-600/10 px-2.5 py-1 text-xs font-semibold leading-5 text-orange-600">
-                  Recommended
+              </CardDescription>
+              <div className="py-4">
+                <span className="text-4xl font-bold text-gray-900">$0</span>
+                <span className="text-gray-600">/month</span>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">3 generations per day</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">5 handwriting styles</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">Basic paper backgrounds</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">PNG downloads</span>
+                </div>
+                <div className="flex items-center gap-3 opacity-60">
+                  <span className="text-gray-400">• Includes ads</span>
                 </div>
               </div>
-              <p className="mt-4 text-sm leading-6 text-gray-600">
-                For professionals and power users
-              </p>
-              <p className="mt-6 flex items-baseline gap-x-1">
-                <span className="text-4xl font-bold tracking-tight text-gray-900">₹432</span>
-                <span className="text-sm font-semibold leading-6 text-gray-600">/month</span>
-              </p>
               
-              <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-600">
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  Unlimited generations
-                </li>
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  All handwriting styles
-                </li>
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  Custom paper upload
-                </li>
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  High-quality PNG & PDF
-                </li>
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  Priority generation
-                </li>
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  No ads
-                </li>
-                <li className="flex gap-x-3">
-                  <Check className="h-6 w-5 flex-none text-orange-600" aria-hidden="true" />
-                  24/7 Priority support
-                </li>
-              </ul>
-              
-              <Button
-                onClick={handleCheckout}
-                disabled={isLoading}
-                className="mt-8 w-full bg-orange-600 hover:bg-orange-700"
-              >
-                {isLoading ? "Processing..." : "Upgrade to Premium"}
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button variant="outline" className="w-full border-orange-200 text-orange-600 hover:bg-orange-50 mt-6">
+                Current Plan
               </Button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* FAQ Section */}
-          <div className="mx-auto mt-24 max-w-2xl sm:mt-32 lg:max-w-4xl">
-            <h2 className="text-2xl font-bold leading-10 tracking-tight text-gray-900">
-              Frequently asked questions
-            </h2>
-            <dl className="mt-10 space-y-6 divide-y divide-gray-900/10">
-              {[
-                {
-                  question: "Can I cancel anytime?",
-                  answer: "Yes, you can cancel your subscription at any time. You'll continue to have access to premium features until the end of your billing period."
-                },
-                {
-                  question: "What payment methods do you accept?",
-                  answer: "We accept all major credit cards, debit cards, UPI, and net banking through Stripe."
-                },
-                {
-                  question: "How realistic is the handwriting?",
-                  answer: "Our AI creates incredibly realistic handwriting that's virtually indistinguishable from human writing."
-                }
-              ].map((faq) => (
-                <div key={faq.question} className="pt-6">
-                  <dt className="text-base font-semibold leading-7 text-gray-900">
-                    {faq.question}
-                  </dt>
-                  <dd className="mt-2 text-base leading-7 text-gray-600">
-                    {faq.answer}
-                  </dd>
+          {/* Premium Plan */}
+          <Card className="bg-white/90 backdrop-blur-sm border-orange-300 shadow-xl relative">
+            <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white">
+              Most Popular
+            </Badge>
+            
+            <CardHeader className="text-center">
+              <div className="bg-orange-100 rounded-full p-3 w-fit mx-auto mb-4">
+                <Crown className="h-8 w-8 text-orange-600" />
+              </div>
+              <CardTitle className="font-quicksand text-2xl text-gray-900">Premium</CardTitle>
+              <CardDescription className="text-gray-600">
+                For serious handwriting enthusiasts
+              </CardDescription>
+              <div className="py-4">
+                <span className="text-4xl font-bold text-gray-900">$4.99</span>
+                <span className="text-gray-600">/month</span>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">25 generations per day</span>
                 </div>
-              ))}
-            </dl>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">All handwriting styles</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">Custom paper upload</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">High-quality PNG & PDF</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">Priority generation</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-green-500" />
+                  <span className="text-gray-700">No ads</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Star className="h-5 w-5 text-orange-500" />
+                  <span className="text-gray-700">Advanced customization</span>
+                </div>
+              </div>
+              
+              <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white mt-6">
+                Upgrade to Premium
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-20">
+          <h2 className="font-quicksand text-3xl font-bold text-center text-gray-900 mb-12">
+            Frequently Asked Questions
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
+              <h3 className="font-quicksand text-lg font-semibold text-gray-900 mb-2">
+                Can I cancel anytime?
+              </h3>
+              <p className="text-gray-600">
+                Yes! You can cancel your subscription at any time. You'll continue to have access 
+                to premium features until the end of your billing period.
+              </p>
+            </div>
+            
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
+              <h3 className="font-quicksand text-lg font-semibold text-gray-900 mb-2">
+                What happens to my generations?
+              </h3>
+              <p className="text-gray-600">
+                Your daily generation count resets every 24 hours. Unused generations don't 
+                roll over to the next day.
+              </p>
+            </div>
+            
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
+              <h3 className="font-quicksand text-lg font-semibold text-gray-900 mb-2">
+                How realistic is the handwriting?
+              </h3>
+              <p className="text-gray-600">
+                Our AI creates incredibly realistic handwriting that's virtually indistinguishable 
+                from human writing, with natural variations and imperfections.
+              </p>
+            </div>
+            
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 border border-orange-100">
+              <h3 className="font-quicksand text-lg font-semibold text-gray-900 mb-2">
+                Can I use my own paper?
+              </h3>
+              <p className="text-gray-600">
+                Yes! Premium users can upload their own paper backgrounds, including notebook 
+                paper, letterhead, or any custom background.
+              </p>
+            </div>
           </div>
         </div>
       </div>
