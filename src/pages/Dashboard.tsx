@@ -2,49 +2,44 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Upload, Sparkles, PenTool, Image as ImageIcon, Loader2, Crown, IndianRupee } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { 
+  Sparkles, 
+  Download, 
+  RotateCcw, 
+  Crown, 
+  IndianRupee, 
+  Loader2,
+  Settings,
+  Zap,
+  Image as ImageIcon
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
+import FontSelector from "@/components/FontSelector";
+import ImprovedTextInput from "@/components/ImprovedTextInput";
+import HandwritingPreview from "@/components/HandwritingPreview";
 import { toast } from "sonner";
 import { useAuth } from '@/contexts/AuthContext';
-import { Badge } from "@/components/ui/badge";
-
-// Placeholder for a generated image component
-const GeneratedImagePreview = ({ src, onClear }: { src: string; onClear: () => void }) => (
-  <motion.div
-    initial={{ scale: 0.9, opacity: 0 }}
-    animate={{ scale: 1, opacity: 1 }}
-    exit={{ scale: 0.9, opacity: 0 }}
-    className="relative w-full h-full"
-  >
-    <img src={src} alt="Generated Handwriting" className="w-full h-full object-cover rounded-lg" />
-    <Button variant="destructive" size="sm" className="absolute top-2 right-2" onClick={onClear}>
-      Clear
-    </Button>
-  </motion.div>
-);
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const [prompt, setPrompt] = useState("");
-  const [style, setStyle] = useState("cursive");
+  const [text, setText] = useState("");
+  const [selectedFont, setSelectedFont] = useState("caveat");
   const [ruledLines, setRuledLines] = useState(true);
-  const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
+  const [paperStyle, setPaperStyle] = useState("lined");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const isPremium = false; // This should come from your auth context or user data
   
-  const playSound = (sound: 'click' | 'save') => {
-    const audio = new Audio(`/sounds/paper-${sound}.m4a`);
-    audio.play().catch(e => console.error("Failed to play sound", e));
-  };
+  // This should come from your auth context or user data
+  const isPremium = false;
+  const generationsUsed = 2;
+  const generationsLimit = isPremium ? Infinity : 3;
   
   const handleGenerate = async () => {
-    if (!prompt.trim()) {
+    if (!text.trim()) {
       toast.error("Please enter some text to generate.");
       return;
     }
@@ -53,19 +48,22 @@ const Dashboard = () => {
       toast.error("You must be logged in to generate handwriting.");
       return;
     }
-    
-    playSound('click');
-    setIsGenerating(true);
-    setGeneratedImage(null); // Clear previous image
 
-    // --- REAL AI GENERATION API CALL ---
+    if (!isPremium && generationsUsed >= generationsLimit) {
+      toast.error("You've reached your daily limit. Upgrade to Premium for unlimited generations!");
+      return;
+    }
+    
+    setIsGenerating(true);
+    setGeneratedImage(null);
+
     const formData = new FormData();
     formData.append("user_id", user.id);
-    formData.append('prompt', prompt);
-    formData.append('style', style);
+    formData.append('prompt', text);
+    formData.append('style', selectedFont);
+    formData.append('ruled_lines', String(ruledLines));
+    formData.append('paper_style', paperStyle);
     formData.append('is_premium', String(isPremium));
-    // In the future, we can add background and handwriting samples here
-    // formData.append('backgroundImage', uploadedBackgroundImageFile);
 
     try {
       const response = await fetch("http://localhost:8000/api/generate", {
@@ -80,7 +78,6 @@ const Dashboard = () => {
       const result = await response.json();
       setGeneratedImage(result.imageUrl);
       
-      playSound('save');
       toast.success("Handwriting generated successfully! ✨");
 
     } catch (error) {
@@ -91,17 +88,19 @@ const Dashboard = () => {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setBackgroundImage(reader.result as string);
-        toast.info("Background image updated.");
-      };
-      reader.readAsDataURL(file);
-      playSound('click');
+  const handleDownload = () => {
+    if (generatedImage) {
+      const link = document.createElement('a');
+      link.href = generatedImage;
+      link.download = `handwriting-${Date.now()}.png`;
+      link.click();
+      toast.success("Image downloaded!");
     }
+  };
+
+  const handleReset = () => {
+    setGeneratedImage(null);
+    toast.info("Preview cleared");
   };
 
   return (
@@ -110,209 +109,221 @@ const Dashboard = () => {
       
       {/* Premium Upgrade Banner for Free Users */}
       {!isPremium && (
-        <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white p-4">
-          <div className="max-w-screen-2xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-3">
+        <motion.div 
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="bg-gradient-to-r from-orange-500 to-amber-500 text-white"
+        >
+          <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-4">
               <Crown className="h-5 w-5" />
-              <span className="font-semibold">Upgrade to Premium for unlimited generations</span>
-              <Badge className="bg-white/20 text-white">
+              <span className="font-semibold">Upgrade to Premium</span>
+              <Badge className="bg-white/20 text-white border-white/30">
                 <IndianRupee className="h-3 w-3 mr-1" />
                 432/mo
               </Badge>
+              <span className="text-orange-100 text-sm">
+                • Unlimited generations • 30+ fonts • Custom backgrounds
+              </span>
             </div>
-            <Button variant="outline" size="sm" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+            >
+              <Zap className="h-4 w-4 mr-2" />
               Upgrade Now
             </Button>
           </div>
-        </div>
+        </motion.div>
       )}
 
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 max-w-screen-2xl mx-auto w-full">
-        {/* Left Column: Controls */}
-        <motion.div
-          initial={{ x: -50, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-8"
         >
-          <Card className="h-full shadow-xl border-2 border-orange-200 bg-white/90 backdrop-blur-sm">
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-t-lg">
-              <CardTitle className="flex items-center gap-3 font-quicksand text-2xl">
-                <PenTool className="h-6 w-6" />
-                Create Your Handwriting
-              </CardTitle>
-              <p className="text-orange-100">Transform your text into beautiful handwriting</p>
-            </CardHeader>
-            <CardContent className="space-y-6 p-6">
-              <div className="space-y-3">
-                <Label htmlFor="prompt" className="text-base font-semibold text-gray-700">
-                  Your Text (Max 10 lines)
-                </Label>
-                <Textarea
-                  id="prompt"
-                  placeholder="Dear Teacher, I'm writing to you in my... 'natural' handwriting. Please excuse the beautiful penmanship as this is definitely my own work..."
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  className="min-h-[150px] text-base border-2 border-orange-200 focus:border-orange-400 rounded-lg"
-                  rows={6}
-                />
-                <div className="text-sm text-gray-500">
-                  {prompt.split('\n').length}/10 lines
-                </div>
-              </div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            AI Handwriting Generator
+          </h1>
+          <p className="text-lg text-gray-600 mb-4">
+            Transform your text into beautiful, realistic handwriting
+          </p>
+          
+          {/* Usage Stats */}
+          <div className="flex items-center justify-center gap-4 text-sm">
+            <Badge variant="outline" className="px-3 py-1">
+              {isPremium ? "Unlimited" : `${generationsUsed}/${generationsLimit} used today`}
+            </Badge>
+            <Badge variant="outline" className="px-3 py-1">
+              {isPremium ? "Premium" : "Free Plan"}
+            </Badge>
+          </div>
+        </motion.div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <Label htmlFor="style" className="text-base font-semibold text-gray-700">
-                    Writing Style
-                  </Label>
-                  <Select value={style} onValueChange={setStyle}>
-                    <SelectTrigger id="style" className="border-2 border-orange-200 focus:border-orange-400">
-                      <SelectValue placeholder="Select a style" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cursive">✒️ Cursive</SelectItem>
-                      <SelectItem value="print">🖊️ Print</SelectItem>
-                      <SelectItem value="messy">📝 Messy</SelectItem>
-                      <SelectItem value="formal">📋 Formal</SelectItem>
-                      {!isPremium && (
-                        <SelectItem value="premium" disabled>
-                          <div className="flex items-center gap-2">
-                            <Crown className="h-4 w-4" />
-                            Premium Styles
-                          </div>
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="flex items-center justify-between rounded-lg border-2 border-orange-200 p-4 bg-orange-50/50">
-                  <div className="space-y-1">
-                    <Label htmlFor="ruled-lines" className="text-base font-semibold text-gray-700">
-                      Ruled Lines
-                    </Label>
-                    <p className="text-sm text-gray-600">Add notebook lines to paper</p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Panel: Controls */}
+          <motion.div
+            initial={{ x: -50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="lg:col-span-1 space-y-6"
+          >
+            {/* Text Input */}
+            <ImprovedTextInput 
+              value={text}
+              onChange={setText}
+              maxLines={10}
+            />
+
+            {/* Font Selection */}
+            <FontSelector 
+              value={selectedFont}
+              onChange={setSelectedFont}
+              isPremium={isPremium}
+            />
+
+            {/* Paper Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-gray-500" />
+                  Paper Settings
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="font-medium text-gray-700">Ruled Lines</label>
+                    <p className="text-sm text-gray-500">Add notebook-style lines</p>
                   </div>
-                  <Switch id="ruled-lines" checked={ruledLines} onCheckedChange={setRuledLines} />
+                  <Switch 
+                    checked={ruledLines} 
+                    onCheckedChange={setRuledLines}
+                  />
                 </div>
-              </div>
 
-              <div className="space-y-3">
-                <Label className="text-base font-semibold text-gray-700">
-                  Custom Background {!isPremium && "(Premium)"}
-                </Label>
-                <Label htmlFor="upload-bg" className="w-full">
-                  <Button 
-                    asChild 
-                    variant="outline" 
-                    className="w-full cursor-pointer border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-50"
-                    disabled={!isPremium}
-                  >
-                    <div>
-                      <Upload className="h-4 w-4 mr-2" />
-                      {isPremium ? "Upload Background" : "Upgrade for Custom Backgrounds"}
-                      <input 
-                        id="upload-bg" 
-                        type="file" 
-                        className="sr-only" 
-                        accept="image/*" 
-                        onChange={handleImageUpload}
-                        disabled={!isPremium}
-                      />
-                    </div>
-                  </Button>
-                </Label>
-              </div>
+                <Separator />
 
-              <Button 
-                size="lg" 
-                className="w-full font-bold text-lg bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg hover:shadow-xl transition-all duration-300" 
-                onClick={handleGenerate} 
-                disabled={isGenerating}
+                <div>
+                  <label className="font-medium text-gray-700 block mb-3">Paper Background</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      variant={paperStyle === "lined" ? "default" : "outline"}
+                      onClick={() => setPaperStyle("lined")}
+                      className="h-16 flex-col gap-2"
+                    >
+                      <div className="w-6 h-6 bg-gradient-to-br from-blue-100 to-blue-200 rounded border"></div>
+                      <span className="text-xs">Lined</span>
+                    </Button>
+                    
+                    <Button 
+                      variant={paperStyle === "plain" ? "default" : "outline"}
+                      onClick={() => setPaperStyle("plain")}
+                      className="h-16 flex-col gap-2"
+                    >
+                      <div className="w-6 h-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded border"></div>
+                      <span className="text-xs">Plain</span>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Right Panel: Preview */}
+          <motion.div
+            initial={{ x: 50, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-2"
+          >
+            <HandwritingPreview 
+              text={text}
+              style={selectedFont}
+              onGenerate={handleGenerate}
+              isGenerating={isGenerating}
+              generatedImage={generatedImage}
+              onImageChange={setGeneratedImage}
+            />
+
+            {/* Action Buttons */}
+            {!isGenerating && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="mt-6 flex gap-4"
               >
-                {isGenerating ? (
+                <Button 
+                  onClick={handleGenerate}
+                  disabled={!text.trim() || !selectedFont || (!isPremium && generationsUsed >= generationsLimit)}
+                  className="flex-1 h-12 text-lg font-semibold bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                >
+                  <Sparkles className="h-5 w-5 mr-2" />
+                  Generate Handwriting
+                </Button>
+                
+                {generatedImage && (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Creating Magic...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-5 w-5" />
-                    Generate Handwriting
+                    <Button 
+                      onClick={handleDownload}
+                      variant="outline" 
+                      className="h-12 px-6 border-orange-200 text-orange-600 hover:bg-orange-50"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
+                    <Button 
+                      onClick={handleReset}
+                      variant="outline" 
+                      className="h-12 px-6"
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Reset
+                    </Button>
                   </>
                 )}
-              </Button>
-
-              {!isPremium && (
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-600 mb-2">
-                    <strong>Free Plan:</strong> 3 generations per day
-                  </p>
-                  <Button size="sm" variant="outline" className="border-orange-300 text-orange-600 hover:bg-orange-100">
-                    Upgrade for Unlimited
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Right Column: Preview */}
-        <motion.div
-          initial={{ x: 50, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-          className="bg-white/90 backdrop-blur-sm rounded-lg border-2 border-orange-200 shadow-xl flex items-center justify-center p-4 h-[70vh] relative overflow-hidden"
-          style={{ 
-            backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none', 
-            backgroundSize: 'cover', 
-            backgroundPosition: 'center' 
-          }}
-        >
-          {/* Paper texture overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
-          
-          <AnimatePresence>
-            {generatedImage ? (
-              <GeneratedImagePreview src={generatedImage} onClear={() => setGeneratedImage(null)} />
-            ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center text-gray-500 z-10"
-              >
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-8 border border-orange-200">
-                  <ImageIcon className="mx-auto h-16 w-16 text-orange-400 mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                    Your handwriting will appear here
-                  </h3>
-                  <p className="text-gray-600">
-                    Fill out the details on the left and click "Generate" to see the magic happen.
-                  </p>
-                </div>
               </motion.div>
             )}
-          </AnimatePresence>
-          
-          <AnimatePresence>
-            {isGenerating && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-20"
-              >
-                <div className="bg-white rounded-xl p-8 shadow-xl border border-orange-200 text-center">
-                  <Loader2 className="h-12 w-12 animate-spin text-orange-500 mx-auto mb-4" />
-                  <p className="text-xl font-semibold text-gray-700 mb-2">Creating your masterpiece...</p>
+
+            {/* Generation Status */}
+            <AnimatePresence>
+              {isGenerating && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="mt-6 bg-white rounded-xl p-6 border border-orange-200 text-center"
+                >
+                  <Loader2 className="h-8 w-8 animate-spin text-orange-500 mx-auto mb-3" />
+                  <p className="text-lg font-semibold text-gray-700 mb-1">Creating your handwriting...</p>
                   <p className="text-gray-500">This usually takes 10-15 seconds</p>
-                </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Usage Limit Warning */}
+            {!isPremium && generationsUsed >= generationsLimit && (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-6 bg-orange-50 border border-orange-200 rounded-xl p-6 text-center"
+              >
+                <Crown className="h-8 w-8 text-orange-500 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-gray-700 mb-2">Daily Limit Reached</h3>
+                <p className="text-gray-600 mb-4">You've used all {generationsLimit} free generations today.</p>
+                <Button className="bg-orange-500 hover:bg-orange-600">
+                  <IndianRupee className="h-4 w-4 mr-2" />
+                  Upgrade to Premium
+                </Button>
               </motion.div>
             )}
-          </AnimatePresence>
-        </motion.div>
-      </main>
+          </motion.div>
+        </div>
+      </div>
     </div>
   );
 };

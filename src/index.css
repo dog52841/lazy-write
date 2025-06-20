@@ -3,8 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+/* Import Google Fonts - Handwriting & Print Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Kalam:wght@300;400;700&family=Architects+Daughter&family=Indie+Flower&family=Shadows+Into+Light&family=Permanent+Marker&family=Covered+By+Your+Grace&family=Amatic+SC:wght@400;700&family=Comic+Neue:wght@300;400;700&family=Handlee&family=Schoolbell&family=Satisfy&family=Great+Vibes&family=Allura&family=Alex+Brush&family=Pinyon+Script&family=Sacramento&family=Tangerine:wght@400;700&family=Kaushan+Script&family=Marck+Script&family=Mr+Dafoe&family=Yellowtail&family=Pacifico&family=Lobster&family=Courgette&family=Righteous&family=Fredoka+One&family=Bungee&family=Orbitron:wght@400;700&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
@@ -85,6 +85,40 @@
     font-style: italic;
     letter-spacing: 0.5px;
   }
+
+  /* Handwriting Fonts */
+  .font-caveat { font-family: 'Caveat', cursive; }
+  .font-dancing-script { font-family: 'Dancing Script', cursive; }
+  .font-kalam { font-family: 'Kalam', cursive; }
+  .font-architects-daughter { font-family: 'Architects Daughter', cursive; }
+  .font-indie-flower { font-family: 'Indie Flower', cursive; }
+  .font-shadows-into-light { font-family: 'Shadows Into Light', cursive; }
+  .font-permanent-marker { font-family: 'Permanent Marker', cursive; }
+  .font-covered-by-your-grace { font-family: 'Covered By Your Grace', cursive; }
+  .font-amatic-sc { font-family: 'Amatic SC', cursive; }
+  .font-comic-neue { font-family: 'Comic Neue', cursive; }
+  .font-handlee { font-family: 'Handlee', cursive; }
+  .font-schoolbell { font-family: 'Schoolbell', cursive; }
+  .font-satisfy { font-family: 'Satisfy', cursive; }
+  .font-great-vibes { font-family: 'Great Vibes', cursive; }
+  .font-allura { font-family: 'Allura', cursive; }
+  .font-alex-brush { font-family: 'Alex Brush', cursive; }
+  .font-pinyon-script { font-family: 'Pinyon Script', cursive; }
+  .font-sacramento { font-family: 'Sacramento', cursive; }
+  .font-tangerine { font-family: 'Tangerine', cursive; }
+  .font-kaushan-script { font-family: 'Kaushan Script', cursive; }
+  .font-marck-script { font-family: 'Marck Script', cursive; }
+  .font-mr-dafoe { font-family: 'Mr Dafoe', cursive; }
+  .font-yellowtail { font-family: 'Yellowtail', cursive; }
+  .font-pacifico { font-family: 'Pacifico', cursive; }
+  .font-lobster { font-family: 'Lobster', cursive; }
+  .font-courgette { font-family: 'Courgette', cursive; }
+  .font-righteous { font-family: 'Righteous', cursive; }
+  .font-fredoka-one { font-family: 'Fredoka One', cursive; }
+  .font-bungee { font-family: 'Bungee', cursive; }
+  .font-orbitron { font-family: 'Orbitron', sans-serif; }
+  .font-rajdhani { font-family: 'Rajdhani', sans-serif; }
+  .font-exo-2 { font-family: 'Exo 2', sans-serif; }
 }
 
 @layer utilities {
