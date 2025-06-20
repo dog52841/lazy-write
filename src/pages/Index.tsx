@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { PenTool, Sparkles, Download, Star, MoveRight, CheckCircle, Users, Zap, Shield } from "lucide-react";
+import { PenTool, Sparkles, Download, Star, MoveRight, CheckCircle, Users, Zap, Shield, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { motion } from "framer-motion";
 
@@ -14,285 +14,247 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="min-h-screen bg-white">
       <Navbar />
       
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20">
-        <div className="text-center relative">
-          {/* Floating decorative elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-20 left-10 w-20 h-20 bg-primary/10 rounded-full blur-xl animate-float"></div>
-            <div className="absolute top-40 right-20 w-32 h-32 bg-secondary/20 rounded-full blur-2xl animate-float" style={{animationDelay: '1s'}}></div>
-            <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-accent/10 rounded-full blur-xl animate-float" style={{animationDelay: '2s'}}></div>
+      <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+        <div className="absolute inset-0 bg-grid-gray-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))]"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24">
+          <div className="text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-orange-100"
+            >
+              <PenTool className="h-10 w-10 text-orange-600" />
+            </motion.div>
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mx-auto max-w-4xl font-display text-5xl font-medium tracking-tight text-gray-900 sm:text-7xl"
+            >
+              Transform text into
+              <span className="relative whitespace-nowrap text-orange-600">
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 418 42"
+                  className="absolute left-0 top-2/3 h-[0.58em] w-full fill-orange-300/70"
+                  preserveAspectRatio="none"
+                >
+                  <path d="m203.371.916c-26.013-2.078-76.686 1.963-124.73 9.946L67.3 12.749C35.421 18.062 18.2 21.766 6.004 25.934 1.244 27.561.828 27.778.874 28.61c.07 1.214.828 1.121 9.595-1.176 9.072-2.377 17.15-3.92 39.246-7.496C123.565 7.986 157.869 4.492 195.942 5.046c7.461.108 19.25 1.696 19.17 2.582-.107 1.183-7.874 4.31-25.75 10.366-21.992 7.45-35.43 12.534-36.701 13.884-2.173 2.308-.202 4.407 4.442 4.734 2.654.187 3.263.157 15.593-.78 35.401-2.686 57.944-3.488 88.365-3.143 46.327.526 75.721 2.23 130.788 7.584 19.787 1.924 20.814 1.98 24.557 1.332l.066-.011c1.201-.203 1.53-1.825.399-2.335-2.911-1.31-4.893-1.604-22.048-3.261-57.509-5.556-87.871-7.36-132.059-7.842-23.239-.254-33.617-.116-50.627.674-11.629.54-42.371 2.494-46.696 2.967-2.359.259 8.133-3.625 26.504-9.81 23.239-7.825 27.934-10.149 28.304-14.005.417-4.348-3.529-6-16.878-7.066Z" />
+                </svg>
+                <span className="relative">handwriting</span>
+              </span>
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mx-auto mt-6 max-w-2xl text-lg text-gray-600"
+            >
+              Create authentic handwriting from any text with AI. Perfect for assignments, notes, and personal projects.
+            </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-10 flex items-center justify-center gap-x-6"
+            >
+              <Link to="/app" onClick={playClickSound}>
+                <Button size="lg" className="bg-orange-600 px-8 py-3 text-white hover:bg-orange-700">
+                  Start for free
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link to="/pricing">
+                <Button variant="outline" size="lg" className="px-8 py-3">
+                  View pricing
+                </Button>
+              </Link>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-10 flex items-center justify-center gap-x-8 text-sm text-gray-600"
+            >
+              <div className="flex items-center gap-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span>No signup required</span>
+              </div>
+              <div className="flex items-center gap-x-2">
+                <Shield className="h-4 w-4 text-blue-500" />
+                <span>100% secure</span>
+              </div>
+              <div className="flex items-center gap-x-2">
+                <Users className="h-4 w-4 text-purple-500" />
+                <span>10,000+ users</span>
+              </div>
+            </motion.div>
           </div>
+        </div>
+      </section>
 
+      {/* Demo Section */}
+      <section className="py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex justify-center mb-8 relative z-10"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mx-auto max-w-2xl text-center"
           >
-            <div className="bg-gradient-to-r from-primary/20 to-accent/20 rounded-full p-6 shadow-2xl border border-primary/30 backdrop-blur-sm">
-              <PenTool className="h-20 w-20 text-primary" />
-            </div>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              See the magic in action
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Watch as our AI transforms typed text into realistic handwriting
+            </p>
           </motion.div>
           
           <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="relative z-10"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="mt-16 overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-gray-200"
           >
-            <h1 className="font-quicksand text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
-              LazyWrite
-            </h1>
-            <div className="inline-block bg-primary/10 px-4 py-2 rounded-full text-sm font-semibold text-primary mb-6 border border-primary/20">
-              ✨ AI-Powered Handwriting Generator
+            <div className="bg-gray-50 px-6 py-4">
+              <div className="flex items-center gap-2">
+                <div className="h-3 w-3 rounded-full bg-red-500"></div>
+                <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
+                <div className="h-3 w-3 rounded-full bg-green-500"></div>
+                <span className="ml-4 text-sm text-gray-500">Generated Handwriting</span>
+              </div>
             </div>
-          </motion.div>
-          
-          <motion.p 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-            className="text-3xl md:text-4xl text-foreground/90 mb-4 font-medium relative z-10"
-          >
-            Handwriting so real, even your teacher can&apos;t tell.
-          </motion.p>
-          
-          <motion.p 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
-            className="text-xl text-foreground/70 mb-12 max-w-3xl mx-auto leading-relaxed relative z-10"
-          >
-            Transform any text into beautiful, authentic handwriting with our advanced AI. 
-            Perfect for assignments, letters, notes, and creative projects.
-          </motion.p>
-          
-          <motion.div 
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.8, ease: "easeOut" }}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center relative z-10"
-          >
-            <Link to="/app" onClick={playClickSound}>
-              <Button size="lg" className="px-10 py-5 text-xl font-semibold group bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-xl hover:shadow-2xl transition-all duration-300">
-                Start Creating Free
-                <MoveRight className="h-6 w-6 ml-3 transition-transform duration-300 group-hover:translate-x-2" />
-              </Button>
-            </Link>
-            <Link to="/pricing">
-              <Button size="lg" variant="outline" className="px-10 py-5 text-xl border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/5">
-                View Pricing
-              </Button>
-            </Link>
-          </motion.div>
-
-          {/* Trust indicators */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1, ease: "easeOut" }}
-            className="flex flex-wrap justify-center items-center gap-8 mt-16 text-sm text-foreground/60 relative z-10"
-          >
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-500" />
-              <span>No signup required to try</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-500" />
-              <span>Trusted by 10,000+ users</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-purple-500" />
-              <span>100% secure & private</span>
+            <div className="bg-white p-8 sm:p-12">
+              <div className="font-handwriting text-xl leading-8 text-gray-900 sm:text-2xl">
+                <div className="mb-6">Dear Teacher,</div>
+                <div className="mb-6 ml-8">
+                  I hope this letter finds you well. I wanted to thank you for all the interesting 
+                  lessons this semester. Your passion for teaching really shows in every class.
+                </div>
+                <div className="mb-6 ml-8">
+                  I&apos;m looking forward to continuing this journey of learning with your guidance.
+                </div>
+                <div>
+                  Best regards,<br />
+                  <span className="ml-8">Alex Johnson</span>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
-      </div>
+      </section>
 
-      {/* Demo Section - Enhanced */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <motion.div
-          initial={{ y: 40, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          viewport={{ once: true }}
-          className="bg-gradient-to-br from-card via-card to-secondary/30 rounded-3xl shadow-2xl border border-border/50 p-8 md:p-12 backdrop-blur-sm"
-        >
-          <div className="text-center mb-12">
-            <h2 className="font-quicksand text-4xl md:text-5xl font-bold mb-4">
-              See the Magic in Action
+      {/* Features Section */}
+      <section className="bg-gray-50 py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Everything you need
             </h2>
-            <p className="text-xl text-foreground/70">
-              Watch as our AI transforms typed text into authentic handwriting
+            <p className="mt-4 text-lg text-gray-600">
+              Powerful features to create perfect handwriting every time
             </p>
           </div>
           
-          <div className="bg-white rounded-2xl p-8 md:p-12 shadow-inner border border-gray-200 notebook-lines relative overflow-hidden">
-            {/* Paper texture overlay */}
-            <div className="absolute inset-0 opacity-5" style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.1'%3E%3Ccircle cx='7' cy='7' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-            }}></div>
-            
-            <div className="space-y-8 text-2xl md:text-3xl text-gray-800 font-handwriting leading-relaxed relative z-10">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                viewport={{ once: true }}
-              >
-                Dear Teacher,
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                viewport={{ once: true }}
-                className="pl-8"
-              >
-                I hope this letter finds you well. I wanted to thank you for 
-                all the interesting lessons this semester. Your passion for 
-                teaching really shows in every class, and it has inspired me 
-                to work harder and learn more.
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
-                viewport={{ once: true }}
-                className="pl-8"
-              >
-                I&apos;m looking forward to continuing this journey of learning 
-                with your guidance in the coming weeks.
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.8 }}
-                viewport={{ once: true }}
-              >
-                Best regards,<br />
-                <span className="ml-8">Alex Johnson</span>
-              </motion.div>
-            </div>
+          <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+            <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+              {[
+                {
+                  name: 'Lightning Fast',
+                  description: 'Generate handwriting in seconds with our advanced AI technology.',
+                  icon: Zap,
+                  color: 'text-yellow-600 bg-yellow-100'
+                },
+                {
+                  name: 'Multiple Styles',
+                  description: 'Choose from various handwriting styles including cursive, print, and custom.',
+                  icon: Star,
+                  color: 'text-blue-600 bg-blue-100'
+                },
+                {
+                  name: 'Print Ready',
+                  description: 'Download high-resolution images perfect for any paper size.',
+                  icon: Download,
+                  color: 'text-green-600 bg-green-100'
+                }
+              ].map((feature) => (
+                <motion.div
+                  key={feature.name}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  viewport={{ once: true }}
+                  className="flex flex-col"
+                >
+                  <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${feature.color}`}>
+                      <feature.icon className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                    {feature.name}
+                  </dt>
+                  <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
+                    <p className="flex-auto">{feature.description}</p>
+                  </dd>
+                </motion.div>
+              ))}
+            </dl>
           </div>
-          
-          <div className="text-center mt-8">
-            <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full text-sm font-semibold text-primary border border-primary/20">
-              <Sparkles className="h-4 w-4" />
-              Generated with LazyWrite AI in 3 seconds
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Features Section - Enhanced */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <motion.div
-          initial={{ y: 40, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
-        >
-          <h2 className="font-quicksand text-5xl font-bold mb-6">
-            Why Choose LazyWrite?
-          </h2>
-          <p className="text-xl text-foreground/70 max-w-3xl mx-auto">
-            Experience the most advanced AI handwriting technology with features designed for perfection
-          </p>
-        </motion.div>
-        
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { 
-              icon: Zap, 
-              title: "Lightning Fast", 
-              description: "Generate handwriting in seconds, not hours. Our AI processes text instantly.",
-              color: "text-yellow-500",
-              bgColor: "bg-yellow-500/10"
-            },
-            { 
-              icon: Sparkles, 
-              title: "AI-Powered", 
-              description: "Advanced machine learning creates handwriting indistinguishable from human writing.",
-              color: "text-purple-500",
-              bgColor: "bg-purple-500/10"
-            },
-            { 
-              icon: Download, 
-              title: "Print Ready", 
-              description: "Download high-resolution images perfect for printing on any paper.",
-              color: "text-green-500",
-              bgColor: "bg-green-500/10"
-            },
-            { 
-              icon: Star, 
-              title: "Multiple Styles", 
-              description: "Choose from cursive, print, messy, neat, and custom handwriting styles.",
-              color: "text-blue-500",
-              bgColor: "bg-blue-500/10"
-            }
-          ].map((feature, i) => (
-            <motion.div 
-              key={feature.title}
-              initial={{ y: 60, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.6, delay: i * 0.1, ease: "easeOut" }}
-              viewport={{ once: true }}
-              className="group bg-card/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-border hover:shadow-2xl transition-all duration-300 hover:scale-105 text-center"
-            >
-              <div className={`${feature.bgColor} rounded-2xl p-4 w-fit mx-auto mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                <feature.icon className={`h-12 w-12 ${feature.color}`} />
-              </div>
-              <h3 className="font-quicksand text-2xl font-semibold mb-4 group-hover:text-primary transition-colors">{feature.title}</h3>
-              <p className="text-foreground/70 leading-relaxed">
-                {feature.description}
-              </p>
-            </motion.div>
-          ))}
         </div>
-      </div>
+      </section>
 
       {/* CTA Section */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <motion.div
-          initial={{ y: 40, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-3xl p-12 text-center border border-primary/20 shadow-xl"
-        >
-          <h2 className="font-quicksand text-4xl md:text-5xl font-bold mb-6">
-            Ready to Transform Your Writing?
-          </h2>
-          <p className="text-xl text-foreground/80 mb-8 max-w-2xl mx-auto">
-            Join thousands of students, professionals, and creatives who trust LazyWrite for their handwriting needs.
-          </p>
-          <Link to="/app" onClick={playClickSound}>
-            <Button size="lg" className="px-12 py-6 text-xl font-semibold group bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-xl hover:shadow-2xl transition-all duration-300">
-              Start Creating Now - It&apos;s Free!
-              <MoveRight className="h-6 w-6 ml-3 transition-transform duration-300 group-hover:translate-x-2" />
-            </Button>
-          </Link>
-        </motion.div>
-      </div>
+      <section className="bg-orange-600">
+        <div className="px-6 py-24 sm:px-6 sm:py-32 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Ready to start creating?
+            </h2>
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-orange-100">
+              Join thousands of users who trust LazyWrite for their handwriting needs.
+            </p>
+            <div className="mt-10 flex items-center justify-center gap-x-6">
+              <Link to="/app" onClick={playClickSound}>
+                <Button size="lg" className="bg-white px-8 py-3 text-orange-600 hover:bg-gray-50">
+                  Start creating now
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="bg-secondary/30 border-t border-border/50 py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="bg-primary/10 rounded-full p-3">
-                <PenTool className="h-8 w-8 text-primary" />
+      <footer className="bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
+          <div className="flex justify-center space-x-6 md:order-2">
+            <Link to="/pricing" className="text-gray-400 hover:text-gray-500">
+              Pricing
+            </Link>
+          </div>
+          <div className="mt-8 md:order-1 md:mt-0">
+            <div className="flex items-center justify-center md:justify-start">
+              <div className="flex items-center space-x-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-600">
+                  <PenTool className="h-5 w-5 text-white" />
+                </div>
+                <span className="text-xl font-bold text-gray-900">LazyWrite</span>
               </div>
-              <span className="font-quicksand font-bold text-3xl">LazyWrite</span>
             </div>
-            <p className="text-foreground/60 text-center">
-              © 2024 LazyWrite. Made with ❤️ for creative minds everywhere.
+            <p className="mt-2 text-center text-xs leading-5 text-gray-500 md:text-left">
+              &copy; 2024 LazyWrite. All rights reserved.
             </p>
           </div>
         </div>
