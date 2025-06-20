@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PenTool, Upload, Sparkles } from "lucide-react";
+import { PenTool, Upload, Sparkles, Clipboard } from "lucide-react";
 
 interface TextInputProps {
   value: string;
@@ -26,6 +26,15 @@ const TextInput = ({ value, onChange, maxLines }: TextInputProps) => {
     onChange(randomSample);
   };
 
+  const handlePasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      onChange(text);
+    } catch (err) {
+      console.error('Failed to read clipboard contents: ', err);
+    }
+  };
+
   return (
     <Card className="bg-white/95 backdrop-blur-sm border-orange-100 shadow-lg">
       <CardHeader>
@@ -39,15 +48,26 @@ const TextInput = ({ value, onChange, maxLines }: TextInputProps) => {
               Enter the text you want to convert to handwriting (max {maxLines} lines)
             </CardDescription>
           </div>
-          <Button
-            onClick={handleSampleText}
-            variant="outline"
-            size="sm"
-            className="border-orange-200 text-orange-600 hover:bg-orange-50"
-          >
-            <Sparkles className="h-4 w-4 mr-1" />
-            Sample
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={handlePasteFromClipboard}
+              variant="outline"
+              size="sm"
+              className="border-orange-200 text-orange-600 hover:bg-orange-50"
+            >
+              <Clipboard className="h-4 w-4 mr-1" />
+              Paste
+            </Button>
+            <Button
+              onClick={handleSampleText}
+              variant="outline"
+              size="sm"
+              className="border-orange-200 text-orange-600 hover:bg-orange-50"
+            >
+              <Sparkles className="h-4 w-4 mr-1" />
+              Sample
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
