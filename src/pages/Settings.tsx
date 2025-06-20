@@ -7,12 +7,24 @@ import { Slider } from "@/components/ui/slider";
 import Navbar from "@/components/Navbar";
 import { User, Palette, PenTool, LogOut, Crown } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Settings = () => {
+  const { user, signOut } = useAuth();
   const [theme, setTheme] = useState("light");
   const [slantLevel, setSlantLevel] = useState([5]);
   const [pressureLevel, setPressureLevel] = useState([7]);
   const [randomnessLevel, setRandomnessLevel] = useState([3]);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Signed out successfully");
+    } catch (error) {
+      toast.error("Error signing out");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
@@ -43,8 +55,8 @@ const Settings = () => {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
                 <div>
-                  <p className="font-medium text-gray-900">alex@example.com</p>
-                  <p className="text-sm text-gray-600">Free Plan • 2 generations left today</p>
+                  <p className="font-medium text-gray-900">{user?.email || "Not signed in"}</p>
+                  <p className="text-sm text-gray-600">Free Plan • 3 generations left today</p>
                 </div>
                 <Button className="bg-orange-500 hover:bg-orange-600 text-white">
                   <Crown className="h-4 w-4 mr-2" />
@@ -54,7 +66,7 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          {/* Theme Section */}
+          {/* Appearance Section */}
           <Card className="bg-white/90 backdrop-blur-sm border-orange-100">
             <CardHeader>
               <CardTitle className="font-quicksand flex items-center gap-2">
@@ -159,7 +171,11 @@ const Settings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full border-red-200 text-red-600 hover:bg-red-50">
+              <Button 
+                onClick={handleSignOut}
+                variant="outline" 
+                className="w-full border-red-200 text-red-600 hover:bg-red-50"
+              >
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
               </Button>
