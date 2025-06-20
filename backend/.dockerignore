@@ -1,0 +1,17 @@
+# Ignore the virtual environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+/uploads/
+/profiles/
+/generated_images/
+
+# Ignore IDE and OS-specific files
+.idea/
+.vscode/
+.DS_Store
+*.swo
+*~ 

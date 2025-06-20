@@ -1,172 +1,179 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
+import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
-import { User, Palette, PenTool, LogOut, Crown } from "lucide-react";
+import { User, Palette, PenTool, LogOut, Crown, CheckCircle } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useStripe } from "@stripe/react-stripe-js";
 import { useState } from "react";
 
 const Settings = () => {
-  const [theme, setTheme] = useState("light");
-  const [slantLevel, setSlantLevel] = useState([5]);
-  const [pressureLevel, setPressureLevel] = useState([7]);
-  const [randomnessLevel, setRandomnessLevel] = useState([3]);
+  const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const stripe = useStripe();
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Placeholder for subscription status - we will replace this with real data later
+  const isPremium = false;
+  const premiumPriceId = "price_1R4MxTSDoDaxuZtEXJ4OxFGE";
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out successfully!");
+    navigate("/");
+  };
+
+  const handleCheckout = async () => {
+    if (!user) {
+      toast.error("You must be logged in to upgrade.");
+      return;
+    }
+    if (!stripe) {
+      toast.error("Payment system is not ready. Please try again in a moment.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("user_id", user.id);
+      formData.append("price_id", premiumPriceId);
+      
+      const VITE_API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+      const res = await fetch(`${VITE_API_URL}/api/create-checkout-session`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create checkout session.");
+      }
+
+      const { sessionId } = await res.json();
+      
+      const { error } = await stripe.redirectToCheckout({ sessionId });
+
+      if (error) {
+        toast.error(error.message);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="font-quicksand text-4xl font-bold text-gray-900 mb-2">
-            Settings
-          </h1>
-          <p className="text-gray-600">
-            Customize your LazyWrite experience
-          </p>
-        </div>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="mb-8">
+            <h1 className="font-quicksand text-4xl font-bold mb-2">Settings</h1>
+            <p className="text-muted-foreground">Manage your account and preferences</p>
+          </div>
 
-        <div className="space-y-6">
-          {/* Profile Section */}
-          <Card className="bg-white/90 backdrop-blur-sm border-orange-100">
-            <CardHeader>
-              <CardTitle className="font-quicksand flex items-center gap-2">
-                <User className="h-5 w-5 text-orange-500" />
-                Profile
-              </CardTitle>
-              <CardDescription>
-                Manage your account information and subscription
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
-                <div>
-                  <p className="font-medium text-gray-900">alex@example.com</p>
-                  <p className="text-sm text-gray-600">Free Plan • 2 generations left today</p>
+          <div className="space-y-8">
+            {/* Profile Section */}
+            <Card className="shadow-sm border-border">
+              <CardHeader>
+                <CardTitle className="font-quicksand flex items-center gap-3">
+                  <User className="h-6 w-6" /> Profile
+                </CardTitle>
+                <CardDescription>This is your public-facing information.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="font-medium">Email</div>
+                  <div className="text-muted-foreground">{user?.email}</div>
                 </div>
-                <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-                  <Crown className="h-4 w-4 mr-2" />
-                  Upgrade
+                <div className="flex items-center space-x-4">
+                  <div className="font-medium">Full Name</div>
+                  <div className="text-muted-foreground">{user?.user_metadata?.full_name || 'Not provided'}</div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Subscription Section */}
+            <Card className="shadow-sm border-border">
+              <CardHeader>
+                <CardTitle className="font-quicksand flex items-center gap-3">
+                  <Crown className="h-6 w-6" /> Subscription
+                </CardTitle>
+                <CardDescription>Manage your billing and subscription plan.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg border">
+                  <div>
+                    <p className="font-medium text-lg">
+                      {isPremium ? "Premium Plan" : "Free Plan"}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {isPremium ? "You have unlimited access to all features." : "Upgrade to unlock premium features."}
+                    </p>
+                  </div>
+                  <Button onClick={handleCheckout} disabled={isPremium || isLoading}>
+                    {isLoading ? "Redirecting..." : isPremium ? "Manage Subscription" : "Upgrade"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Appearance Section */}
+            <Card className="shadow-sm border-border">
+              <CardHeader>
+                <CardTitle className="font-quicksand flex items-center gap-3">
+                  <Palette className="h-6 w-6" /> Appearance
+                </CardTitle>
+                <CardDescription>Customize the look and feel of the app.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  { name: "Light", value: "light" },
+                  { name: "Dark", value: "dark" },
+                  { name: "Comfort", value: "system" } // "system" often defaults to a user's preference
+                ].map((item) => (
+                  <Button
+                    key={item.value}
+                    variant={theme === item.value ? "default" : "outline"}
+                    onClick={() => setTheme(item.value)}
+                    className="flex items-center justify-center gap-2 py-8 text-lg"
+                  >
+                    {theme === item.value && <CheckCircle className="h-5 w-5" />}
+                    {item.name}
+                  </Button>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Account Actions */}
+            <Card className="shadow-sm border-border border-destructive/50">
+               <CardHeader>
+                <CardTitle className="font-quicksand flex items-center gap-3 text-destructive">
+                  <LogOut className="h-6 w-6" /> Danger Zone
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex justify-between items-center">
+                <p className="text-muted-foreground">Sign out of your account on this device.</p>
+                <Button variant="destructive" onClick={handleSignOut}>
+                  Sign Out
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Theme Section */}
-          <Card className="bg-white/90 backdrop-blur-sm border-orange-100">
-            <CardHeader>
-              <CardTitle className="font-quicksand flex items-center gap-2">
-                <Palette className="h-5 w-5 text-orange-500" />
-                Appearance
-              </CardTitle>
-              <CardDescription>
-                Customize the look and feel of LazyWrite
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Theme</label>
-                  <p className="text-sm text-gray-500">Choose your preferred color scheme</p>
-                </div>
-                <Select value={theme} onValueChange={setTheme}>
-                  <SelectTrigger className="w-40 bg-orange-50/50 border-orange-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="comfort">Comfort Orange</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Handwriting Preferences */}
-          <Card className="bg-white/90 backdrop-blur-sm border-orange-100">
-            <CardHeader>
-              <CardTitle className="font-quicksand flex items-center gap-2">
-                <PenTool className="h-5 w-5 text-orange-500" />
-                Handwriting Preferences
-              </CardTitle>
-              <CardDescription>
-                Fine-tune your default handwriting characteristics
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Slant Level</label>
-                  <span className="text-sm text-gray-500">{slantLevel[0]}/10</span>
-                </div>
-                <Slider
-                  value={slantLevel}
-                  onValueChange={setSlantLevel}
-                  max={10}
-                  step={1}
-                  className="w-full"
-                />
-                <p className="text-xs text-gray-500">
-                  Controls how much your handwriting leans (0 = straight, 10 = very slanted)
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Pressure</label>
-                  <span className="text-sm text-gray-500">{pressureLevel[0]}/10</span>
-                </div>
-                <Slider
-                  value={pressureLevel}
-                  onValueChange={setPressureLevel}
-                  max={10}
-                  step={1}
-                  className="w-full"
-                />
-                <p className="text-xs text-gray-500">
-                  Controls line thickness and darkness (1 = light, 10 = heavy)
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-gray-700">Randomness</label>
-                  <span className="text-sm text-gray-500">{randomnessLevel[0]}/10</span>
-                </div>
-                <Slider
-                  value={randomnessLevel}
-                  onValueChange={setRandomnessLevel}
-                  max={10}
-                  step={1}
-                  className="w-full"
-                />
-                <p className="text-xs text-gray-500">
-                  Controls natural variations in your handwriting (0 = perfect, 10 = very messy)
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Account Actions */}
-          <Card className="bg-white/90 backdrop-blur-sm border-orange-100">
-            <CardHeader>
-              <CardTitle className="font-quicksand text-gray-900">Account Actions</CardTitle>
-              <CardDescription>
-                Manage your account and data
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="outline" className="w-full border-red-200 text-red-600 hover:bg-red-50">
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.div>
+      </main>
     </div>
   );
 };
