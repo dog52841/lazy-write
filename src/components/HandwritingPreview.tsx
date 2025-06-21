@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Download, RotateCcw } from "lucide-react";
+import { Sparkles, Download, RotateCcw, Wand2 } from "lucide-react";
 
 interface HandwritingPreviewProps {
   text: string;
@@ -36,55 +36,74 @@ const HandwritingPreview = ({
 
   const getStyleFont = (style: string) => {
     switch (style) {
-      case 'cursive': return 'font-handwriting text-lg';
-      case 'print': return 'font-mono text-base';
-      case 'messy': return 'font-handwriting text-lg transform -rotate-1';
-      case 'neat': return 'font-serif text-base';
-      case 'vintage': return 'font-handwriting text-xl';
-      default: return 'font-handwriting text-lg';
+      case 'dancing-script': return 'font-handwriting text-2xl';
+      case 'great-vibes': return 'font-handwriting text-2xl';
+      case 'caveat': return 'font-casual text-xl';
+      case 'roboto': return 'font-sans text-lg';
+      case 'open-sans': return 'font-sans text-lg';
+      case 'lato': return 'font-sans text-lg';
+      default: return 'font-handwriting text-xl';
     }
   };
 
   return (
-    <Card className="bg-white/95 backdrop-blur-sm border-orange-100 shadow-xl">
-      <CardHeader>
+    <Card className="glass-effect border-0 shadow-2xl card-hover overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="font-quicksand text-xl">Handwriting Preview</CardTitle>
-            <CardDescription>Your AI-generated handwriting will appear here</CardDescription>
+            <CardTitle className="text-2xl font-display text-gray-900 flex items-center gap-3">
+              <Wand2 className="h-6 w-6 text-blue-600" />
+              Handwriting Preview
+            </CardTitle>
+            <CardDescription className="text-gray-600 mt-1">
+              Your AI-generated handwriting will appear here
+            </CardDescription>
           </div>
           {style && (
-            <Badge variant="outline" className="border-orange-300 text-orange-700 bg-orange-50">
-              {style.charAt(0).toUpperCase() + style.slice(1)} Style
+            <Badge 
+              variant="outline" 
+              className="border-blue-300 text-blue-700 bg-blue-50 px-3 py-1 font-medium"
+            >
+              {style.charAt(0).toUpperCase() + style.slice(1).replace('-', ' ')}
             </Badge>
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      
+      <CardContent className="p-8">
         <div className="relative">
-          {/* Paper Background */}
-          <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 rounded-xl p-8 border-2 border-blue-100 min-h-[400px] paper-texture relative overflow-hidden">
-            {/* Notebook lines */}
-            <div className="absolute inset-0 opacity-20">
-              {Array.from({ length: 15 }, (_, i) => (
-                <div key={i} className="border-b border-blue-200" style={{ top: `${(i + 1) * 24}px`, position: 'absolute', left: '32px', right: '32px' }} />
-              ))}
-            </div>
+          {/* Enhanced Paper Background */}
+          <div className="bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/30 rounded-2xl p-8 border-2 border-blue-100 min-h-[500px] paper-texture relative overflow-hidden shadow-inner">
+            {/* Decorative elements */}
+            <div className="absolute top-4 left-4 w-8 h-8 bg-red-100 rounded-full opacity-60"></div>
+            <div className="absolute top-4 left-16 w-8 h-8 bg-red-100 rounded-full opacity-60"></div>
+            <div className="absolute top-4 left-28 w-8 h-8 bg-red-100 rounded-full opacity-60"></div>
             
-            {/* Generated or Preview Content */}
+            {/* Red margin line */}
+            <div className="absolute left-16 top-0 bottom-0 w-px bg-red-200 opacity-60"></div>
+            
+            {/* Notebook lines */}
+            <div className="absolute inset-0 opacity-20 notebook-lines"></div>
+            
+            {/* Content */}
             {generatedImage ? (
-              <div className="relative z-10">
-                <img src={generatedImage} alt="Generated handwriting" className="w-full h-auto rounded-lg shadow-sm" />
+              <div className="relative z-10 flex justify-center">
+                <img 
+                  src={generatedImage} 
+                  alt="Generated handwriting" 
+                  className="max-w-full h-auto rounded-xl shadow-lg border border-gray-200" 
+                />
               </div>
             ) : text ? (
-              <div className="relative z-10 space-y-3 pl-8">
-                {text.split('\n').slice(0, 10).map((line, index) => (
+              <div className="relative z-10 space-y-4 pl-8 pt-4">
+                {text.split('\n').slice(0, 12).map((line, index) => (
                   <div 
                     key={index} 
-                    className={`${getStyleFont(style)} text-gray-800 leading-relaxed`}
+                    className={`${getStyleFont(style)} text-gray-800 leading-relaxed transition-all duration-300`}
                     style={{ 
-                      transform: `rotate(${Math.random() * 0.5 - 0.25}deg)`,
-                      marginLeft: `${Math.random() * 4}px`
+                      transform: `rotate(${Math.random() * 0.8 - 0.4}deg)`,
+                      marginLeft: `${Math.random() * 6}px`,
+                      animationDelay: `${index * 0.1}s`
                     }}
                   >
                     {line || '\u00A0'}
@@ -92,55 +111,59 @@ const HandwritingPreview = ({
                 ))}
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full text-center text-gray-400">
-                <div>
-                  <Sparkles className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium">Enter text to see preview</p>
-                  <p className="text-sm">Your handwriting will appear here</p>
+              <div className="flex items-center justify-center h-full text-center text-gray-400 relative z-10">
+                <div className="animate-float">
+                  <Sparkles className="h-20 w-20 mx-auto mb-6 opacity-50 text-blue-400" />
+                  <h3 className="text-2xl font-display font-semibold mb-2 text-gray-600">
+                    Ready to Create Magic?
+                  </h3>
+                  <p className="text-lg text-gray-500">
+                    Enter your text and watch it transform into beautiful handwriting
+                  </p>
                 </div>
               </div>
             )}
           </div>
           
-          {/* Action Buttons */}
-          <div className="flex gap-3 mt-6">
+          {/* Enhanced Action Buttons */}
+          <div className="flex flex-wrap gap-4 mt-8">
             <Button 
               onClick={onGenerate}
               disabled={isGenerating || !text.trim() || !style}
-              className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg"
+              className="flex-1 min-w-[200px] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-xl button-glow text-lg py-6 rounded-xl font-semibold"
             >
               {isGenerating ? (
                 <>
-                  <Sparkles className="h-4 w-4 mr-2 animate-spin" />
-                  Generating...
+                  <Sparkles className="h-5 w-5 mr-3 animate-spin" />
+                  Generating Magic...
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-4 w-4 mr-2" />
+                  <Sparkles className="h-5 w-5 mr-3" />
                   Generate Handwriting
                 </>
               )}
             </Button>
             
             {generatedImage && (
-              <>
+              <div className="flex gap-3">
                 <Button 
                   onClick={handleDownload}
                   variant="outline" 
-                  className="border-orange-200 text-orange-600 hover:bg-orange-50"
+                  className="border-blue-200 text-blue-600 hover:bg-blue-50 px-6 py-6 rounded-xl font-medium"
                 >
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="h-5 w-5 mr-2" />
                   Download
                 </Button>
                 <Button 
                   onClick={handleReset}
                   variant="outline" 
-                  className="border-gray-200 text-gray-600 hover:bg-gray-50"
+                  className="border-gray-200 text-gray-600 hover:bg-gray-50 px-6 py-6 rounded-xl font-medium"
                 >
-                  <RotateCcw className="h-4 w-4 mr-2" />
+                  <RotateCcw className="h-5 w-5 mr-2" />
                   Reset
                 </Button>
-              </>
+              </div>
             )}
           </div>
         </div>

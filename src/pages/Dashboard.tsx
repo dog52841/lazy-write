@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { PenTool, LogOut } from "lucide-react";
+import { PenTool, LogOut, Sparkles, Crown, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHandwritingData } from "@/hooks/useHandwritingData";
@@ -99,39 +99,78 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-yellow-50 to-red-50">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-sm border-b border-orange-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-2">
-              <PenTool className="h-8 w-8 text-orange-500" />
-              <span className="font-quicksand font-bold text-xl text-gray-900">LazyWrite</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* Enhanced Header */}
+      <header className="glass-effect sticky top-0 z-50 border-b">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <Link to="/" className="flex items-center space-x-3 group">
+              <div className="relative">
+                <PenTool className="h-10 w-10 text-blue-600 group-hover:text-blue-700 transition-colors animate-float" />
+                <div className="absolute -inset-1 bg-blue-200 rounded-full blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
+              </div>
+              <div>
+                <span className="font-display text-2xl font-bold gradient-text">LazyWrite</span>
+                <div className="text-xs text-gray-500 font-medium">AI Handwriting Generator</div>
+              </div>
             </Link>
             
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                Welcome, {user?.user_metadata?.full_name || user?.email}!
-              </span>
-              <Button
-                onClick={handleSignOut}
-                variant="outline"
-                size="sm"
-                className="border-orange-200 text-gray-600 hover:bg-orange-50"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
+            <div className="flex items-center space-x-6">
+              {isPremium && (
+                <div className="flex items-center space-x-2 bg-gradient-to-r from-yellow-100 to-orange-100 px-4 py-2 rounded-full border border-yellow-200">
+                  <Crown className="h-4 w-4 text-yellow-600" />
+                  <span className="text-sm font-semibold text-yellow-800">Premium</span>
+                </div>
+              )}
+              
+              <div className="hidden sm:block text-right">
+                <div className="text-sm font-medium text-gray-900">
+                  {user?.user_metadata?.full_name || 'Welcome'}
+                </div>
+                <div className="text-xs text-gray-500">{user?.email}</div>
+              </div>
+              
+              <div className="flex space-x-2">
+                <Link to="/settings">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
+                </Link>
+                <Button
+                  onClick={handleSignOut}
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Input & Settings */}
-          <div className="lg:col-span-1 space-y-6">
+      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4">
+            Transform Your Text Into
+            <span className="gradient-text block">Beautiful Handwriting</span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Generate realistic handwriting with AI. Choose from professional fonts and paper styles.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          {/* Left Sidebar - Controls */}
+          <div className="xl:col-span-4 space-y-6">
             {!isPremium && (
               <GenerationStatus
                 generationsLeft={generationsLeft}
@@ -167,8 +206,8 @@ const Dashboard = () => {
             />
           </div>
           
-          {/* Right Column - Preview */}
-          <div className="lg:col-span-2">
+          {/* Right Main Area - Preview */}
+          <div className="xl:col-span-8">
             <HandwritingPreview
               text={text}
               style={selectedFont}
