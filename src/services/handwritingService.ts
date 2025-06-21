@@ -1,4 +1,3 @@
-
 // Enhanced Handwriting Generation Service with Real Font Support
 interface GenerationRequest {
   text: string;
@@ -317,30 +316,51 @@ class HandwritingService {
     }
 
     if (format === 'pdf') {
-      // For PDF export (premium only)
-      const { jsPDF } = await import('jspdf');
-      const pdf = new jsPDF();
-      
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
+      try {
+        // For PDF export (premium only)
+        const jsPDF = (await import('jspdf')).default;
+        const pdf = new jsPDF();
+        
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        
+        return new Promise((resolve, reject) => {
+          img.onload = () => {
+            try {
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+              if (ctx) {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+                pdf.addImage(imgData, 'JPEG', 10, 10, 190, 0);
+                pdf.save('handwriting.pdf');
+                resolve();
+              } else {
+                reject(new Error('Canvas context not available'));
+              }
+            } catch (error) {
+              reject(error);
+            }
+          };
           
-          pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 10, 10, 190, 0);
-          pdf.save('handwriting.pdf');
-        }
-      };
-      img.src = imageUrl;
+          img.onerror = () => reject(new Error('Failed to load image'));
+          img.src = imageUrl;
+        });
+      } catch (error) {
+        console.error('PDF export failed:', error);
+        throw new Error('PDF export failed. Please try again.');
+      }
     } else {
       // For PNG/JPG export
       const link = document.createElement('a');
       link.href = imageUrl;
       link.download = `handwriting.${format}`;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     }
   }
 }
