@@ -18,15 +18,15 @@ const PaperSelector = ({ value, onChange, isPremium }: PaperSelectorProps) => {
 
   return (
     <Card className="glass-effect border-0 shadow-lg card-hover">
-      <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50 border-b">
+      <CardHeader className="bg-gradient-to-r from-slate-50 to-emerald-50 border-b">
         <CardTitle className="font-display flex items-center gap-3">
           <div className="relative">
-            <FileText className="h-6 w-6 text-green-600" />
+            <FileText className="h-6 w-6 text-emerald-600" />
             <Sparkles className="h-3 w-3 text-teal-500 absolute -bottom-1 -right-1" />
           </div>
           Paper Background
           {isPremium && (
-            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold px-3 py-1">
+            <Badge className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold px-3 py-1">
               <Crown className="h-3 w-3 mr-1" />
               Premium
             </Badge>
@@ -45,8 +45,8 @@ const PaperSelector = ({ value, onChange, isPremium }: PaperSelectorProps) => {
               variant={value === bg.id ? "default" : "outline"}
               className={`h-24 flex-col gap-3 relative p-4 rounded-xl transition-all duration-300 ${
                 value === bg.id 
-                  ? "bg-gradient-to-br from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white border-green-500 shadow-lg animate-pulse-glow" 
-                  : "border-green-200 text-gray-700 hover:bg-green-50 hover:border-green-300 card-hover"
+                  ? "bg-gradient-to-br from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-emerald-500 shadow-lg" 
+                  : "border-slate-200 text-gray-700 hover:bg-slate-50 hover:border-slate-300 card-hover"
               }`}
               onClick={() => onChange(bg.id)}
             >
@@ -101,19 +101,19 @@ const PaperSelector = ({ value, onChange, isPremium }: PaperSelectorProps) => {
               <span className="text-sm font-semibold">{bg.name}</span>
               
               {isPremium && !PAPER_BACKGROUNDS.free.some(f => f.id === bg.id) && (
-                <Crown className="h-3 w-3 text-amber-400 absolute top-2 right-2" />
+                <Crown className="h-3 w-3 text-blue-600 absolute top-2 right-2" />
               )}
             </Button>
           ))}
         </div>
         
         {!isPremium && (
-          <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl">
+          <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
             <div className="flex items-center gap-3">
-              <Crown className="h-5 w-5 text-amber-600" />
+              <Crown className="h-5 w-5 text-blue-600" />
               <div>
-                <div className="font-semibold text-amber-800">Premium Paper Collection</div>
-                <div className="text-sm text-amber-700">
+                <div className="font-semibold text-blue-800">Premium Paper Collection</div>
+                <div className="text-sm text-blue-700">
                   Unlock 5 more professional paper backgrounds including vintage parchment!
                 </div>
               </div>

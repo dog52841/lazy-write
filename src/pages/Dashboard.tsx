@@ -117,9 +117,9 @@ const Dashboard = () => {
             
             <div className="flex items-center space-x-6">
               {isPremium && (
-                <div className="flex items-center space-x-2 bg-gradient-to-r from-yellow-100 to-orange-100 px-4 py-2 rounded-full border border-yellow-200">
-                  <Crown className="h-4 w-4 text-yellow-600" />
-                  <span className="text-sm font-semibold text-yellow-800">Premium</span>
+                <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-indigo-100 px-4 py-2 rounded-full border border-blue-200">
+                  <Crown className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-800">Premium</span>
                 </div>
               )}
               
