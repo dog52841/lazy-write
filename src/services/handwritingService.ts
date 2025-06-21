@@ -1,11 +1,11 @@
 
-// Handwriting Generation Service
-// Following the ideal AI setup provided by user
-
+// Enhanced Handwriting Generation Service with Real Font Support
 interface GenerationRequest {
   text: string;
   style: string;
   background?: string;
+  fontSize?: number;
+  lineHeight?: number;
 }
 
 interface GenerationResponse {
@@ -14,150 +14,333 @@ interface GenerationResponse {
   success: boolean;
 }
 
+// Google Fonts configuration for different tiers
+export const FONT_COLLECTIONS = {
+  free: {
+    cursive: [
+      { id: 'dancing-script', name: 'Dancing Script', family: 'Dancing Script' },
+      { id: 'great-vibes', name: 'Great Vibes', family: 'Great Vibes' }
+    ],
+    printed: [
+      { id: 'roboto', name: 'Roboto', family: 'Roboto' },
+      { id: 'open-sans', name: 'Open Sans', family: 'Open Sans' },
+      { id: 'lato', name: 'Lato', family: 'Lato' }
+    ]
+  },
+  premium: {
+    cursive: [
+      { id: 'dancing-script', name: 'Dancing Script', family: 'Dancing Script' },
+      { id: 'great-vibes', name: 'Great Vibes', family: 'Great Vibes' },
+      { id: 'pacifico', name: 'Pacifico', family: 'Pacifico' },
+      { id: 'kaushan-script', name: 'Kaushan Script', family: 'Kaushan Script' },
+      { id: 'allura', name: 'Allura', family: 'Allura' },
+      { id: 'satisfy', name: 'Satisfy', family: 'Satisfy' },
+      { id: 'alex-brush', name: 'Alex Brush', family: 'Alex Brush' },
+      { id: 'pinyon-script', name: 'Pinyon Script', family: 'Pinyon Script' },
+      { id: 'league-script', name: 'League Script', family: 'League Script' },
+      { id: 'tangerine', name: 'Tangerine', family: 'Tangerine' },
+      { id: 'cookie', name: 'Cookie', family: 'Cookie' },
+      { id: 'marck-script', name: 'Marck Script', family: 'Marck Script' },
+      { id: 'shadows-into-light', name: 'Shadows Into Light', family: 'Shadows Into Light' },
+      { id: 'indie-flower', name: 'Indie Flower', family: 'Indie Flower' },
+      { id: 'caveat', name: 'Caveat', family: 'Caveat' }
+    ],
+    printed: [
+      { id: 'roboto', name: 'Roboto', family: 'Roboto' },
+      { id: 'open-sans', name: 'Open Sans', family: 'Open Sans' },
+      { id: 'lato', name: 'Lato', family: 'Lato' },
+      { id: 'montserrat', name: 'Montserrat', family: 'Montserrat' },
+      { id: 'source-sans-pro', name: 'Source Sans Pro', family: 'Source Sans Pro' },
+      { id: 'raleway', name: 'Raleway', family: 'Raleway' },
+      { id: 'ubuntu', name: 'Ubuntu', family: 'Ubuntu' },
+      { id: 'nunito', name: 'Nunito', family: 'Nunito' },
+      { id: 'poppins', name: 'Poppins', family: 'Poppins' },
+      { id: 'inter', name: 'Inter', family: 'Inter' }
+    ]
+  }
+};
+
+export const PAPER_BACKGROUNDS = {
+  free: [
+    { id: 'lined', name: 'Lined Paper', preview: 'bg-gradient-to-br from-blue-50 to-blue-100' },
+    { id: 'plain', name: 'Plain White', preview: 'bg-white' },
+    { id: 'grid', name: 'Grid Paper', preview: 'bg-gradient-to-br from-gray-50 to-gray-100' }
+  ],
+  premium: [
+    { id: 'lined', name: 'Lined Paper', preview: 'bg-gradient-to-br from-blue-50 to-blue-100' },
+    { id: 'plain', name: 'Plain White', preview: 'bg-white' },
+    { id: 'grid', name: 'Grid Paper', preview: 'bg-gradient-to-br from-gray-50 to-gray-100' },
+    { id: 'vintage', name: 'Vintage Parchment', preview: 'bg-gradient-to-br from-yellow-50 to-amber-100' },
+    { id: 'notebook', name: 'Spiral Notebook', preview: 'bg-gradient-to-br from-blue-50 to-indigo-100' },
+    { id: 'legal', name: 'Legal Pad', preview: 'bg-gradient-to-br from-yellow-100 to-yellow-200' },
+    { id: 'graph', name: 'Graph Paper', preview: 'bg-gradient-to-br from-green-50 to-green-100' },
+    { id: 'dotted', name: 'Dotted Paper', preview: 'bg-gradient-to-br from-purple-50 to-purple-100' }
+  ]
+};
+
 class HandwritingService {
-  private baseUrl = 'https://api.example-handwriting.com'; // Replace with actual API
+  private loadedFonts = new Set<string>();
 
-  // Step 1: Generate practice prompts using LLM (GPT-4.1 / Claude / DeepSeek)
-  async generatePracticePrompts(context: string): Promise<string[]> {
-    console.log('🤖 Generating practice prompts with LLM...');
+  // Load Google Fonts dynamically
+  private async loadGoogleFont(fontFamily: string): Promise<void> {
+    if (this.loadedFonts.has(fontFamily)) return;
+
+    const fontUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontFamily)}:wght@400;700&display=swap`;
     
-    // Simulate API call to LLM service
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const prompts = [
-      "Write a letter to your future self",
-      "Describe your perfect day in detail",
-      "Copy your favorite poem or quote",
-      "Write down three things you're grateful for"
-    ];
-    
-    return prompts;
+    return new Promise((resolve, reject) => {
+      const link = document.createElement('link');
+      link.href = fontUrl;
+      link.rel = 'stylesheet';
+      link.onload = () => {
+        this.loadedFonts.add(fontFamily);
+        resolve();
+      };
+      link.onerror = reject;
+      document.head.appendChild(link);
+    });
   }
 
-  // Step 2: Understand user requests using LLM (GPT-4.1 / DeepSeek)
-  async analyzeUserRequest(text: string, style: string): Promise<any> {
-    console.log('🧠 Analyzing user request with LLM...');
+  // Generate realistic handwriting on canvas
+  private async generateHandwritingCanvas(
+    text: string, 
+    fontFamily: string, 
+    background: string,
+    fontSize: number = 24
+  ): Promise<string> {
+    // Load the font first
+    await this.loadGoogleFont(fontFamily);
     
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    return {
-      textComplexity: text.length > 100 ? 'high' : 'medium',
-      estimatedLines: Math.ceil(text.length / 50),
-      suggestedStyle: style || 'cursive',
-      processingTime: Math.max(2, Math.ceil(text.length / 100))
-    };
-  }
+    // Wait for font to load
+    await new Promise(resolve => setTimeout(resolve, 200));
 
-  // Step 3: Extract handwriting style using CV + DL (MyTextInYourHandwriting / GAN)
-  async extractHandwritingStyle(style: string): Promise<any> {
-    console.log('✍️ Extracting handwriting style with CV + DL...');
-    
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    
-    return {
-      styleVector: new Array(128).fill(0).map(() => Math.random()),
-      styleConfidence: 0.95,
-      recommendedSize: style === 'messy' ? 'large' : 'medium'
-    };
-  }
-
-  // Step 4: Generate handwriting image using Diffusion model (Fine-tuned Stable Diffusion)
-  async generateHandwritingImage(text: string, styleVector: number[]): Promise<string> {
-    console.log('🎨 Generating handwriting with Diffusion model...');
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Simulate generating an image - in real implementation, this would call the diffusion model
     const canvas = document.createElement('canvas');
     canvas.width = 800;
     canvas.height = 600;
     const ctx = canvas.getContext('2d');
     
-    if (ctx) {
-      ctx.fillStyle = '#000';
-      ctx.font = '24px cursive';
+    if (!ctx) throw new Error('Canvas context not available');
+
+    // Draw background
+    this.drawBackground(ctx, canvas, background);
+    
+    // Set font properties
+    ctx.font = `${fontSize}px "${fontFamily}", cursive`;
+    ctx.fillStyle = '#2c3e50';
+    ctx.textBaseline = 'top';
+    
+    // Add slight variations for realistic handwriting
+    const lines = text.split('\n');
+    let y = 60;
+    const lineHeight = fontSize * 1.5;
+    
+    lines.forEach((line, lineIndex) => {
+      if (y > canvas.height - 100) return; // Don't overflow
       
-      const lines = text.split('\n');
-      lines.forEach((line, index) => {
-        ctx.fillText(line, 50, 50 + (index * 40));
+      let x = 60;
+      const words = line.split(' ');
+      
+      words.forEach((word, wordIndex) => {
+        // Add natural variations
+        const xVariation = (Math.random() - 0.5) * 3;
+        const yVariation = (Math.random() - 0.5) * 2;
+        const rotation = (Math.random() - 0.5) * 0.02;
+        
+        ctx.save();
+        ctx.translate(x + xVariation, y + yVariation);
+        ctx.rotate(rotation);
+        ctx.fillText(word, 0, 0);
+        ctx.restore();
+        
+        // Calculate word width for spacing
+        const wordWidth = ctx.measureText(word + ' ').width;
+        x += wordWidth;
+        
+        // Line wrap
+        if (x > canvas.width - 100) {
+          x = 60;
+          y += lineHeight;
+        }
       });
-    }
+      
+      y += lineHeight;
+    });
     
-    return canvas.toDataURL();
+    return canvas.toDataURL('image/png');
   }
 
-  // Step 5: Place on background using CV / OpenCV / PIL (Python image processing tools)
-  async placeOnBackground(handwritingImage: string, backgroundType: string = 'lined'): Promise<string> {
-    console.log('📄 Placing handwriting on background with CV tools...');
+  private drawBackground(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, background: string) {
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Simulate background placement
-    const canvas = document.createElement('canvas');
-    canvas.width = 800;
-    canvas.height = 600;
-    const ctx = canvas.getContext('2d');
-    
-    if (ctx) {
-      // Draw background
-      if (backgroundType === 'lined') {
+    switch (background) {
+      case 'lined':
         ctx.fillStyle = '#f8f9ff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         // Draw lines
         ctx.strokeStyle = '#e0e5ff';
         ctx.lineWidth = 1;
-        for (let y = 50; y < canvas.height; y += 40) {
+        for (let y = 60; y < canvas.height; y += 36) {
           ctx.beginPath();
           ctx.moveTo(50, y);
           ctx.lineTo(canvas.width - 50, y);
           ctx.stroke();
         }
-      }
-      
-      // Load and draw handwriting (simplified simulation)
-      const img = new Image();
-      img.onload = () => {
-        ctx.globalCompositeOperation = 'multiply';
-        ctx.drawImage(img, 0, 0);
-      };
-      img.src = handwritingImage;
+        
+        // Red margin line
+        ctx.strokeStyle = '#ffcccb';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(80, 0);
+        ctx.lineTo(80, canvas.height);
+        ctx.stroke();
+        break;
+        
+      case 'grid':
+        ctx.fillStyle = '#fafafa';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.strokeStyle = '#e5e5e5';
+        ctx.lineWidth = 0.5;
+        
+        // Vertical lines
+        for (let x = 30; x < canvas.width; x += 30) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
+        }
+        
+        // Horizontal lines
+        for (let y = 30; y < canvas.height; y += 30) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+        break;
+        
+      case 'vintage':
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, '#fef7d3');
+        gradient.addColorStop(1, '#f4e4bc');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Add texture
+        ctx.fillStyle = 'rgba(139, 101, 8, 0.05)';
+        for (let i = 0; i < 100; i++) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          const size = Math.random() * 3;
+          ctx.fillRect(x, y, size, size);
+        }
+        break;
+        
+      case 'notebook':
+        ctx.fillStyle = '#f0f4ff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Spiral holes
+        ctx.fillStyle = '#ddd';
+        for (let y = 40; y < canvas.height; y += 60) {
+          ctx.beginPath();
+          ctx.arc(25, y, 8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        // Lines
+        ctx.strokeStyle = '#c5d4ff';
+        ctx.lineWidth = 1;
+        for (let y = 60; y < canvas.height; y += 36) {
+          ctx.beginPath();
+          ctx.moveTo(50, y);
+          ctx.lineTo(canvas.width - 20, y);
+          ctx.stroke();
+        }
+        break;
+        
+      default:
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    
-    return canvas.toDataURL();
   }
 
-  // Main generation method that orchestrates all steps
+  // Main generation method
   async generateHandwriting(request: GenerationRequest): Promise<GenerationResponse> {
     const startTime = Date.now();
     
     try {
-      // Step 1 & 2: Analyze request
-      const analysis = await this.analyzeUserRequest(request.text, request.style);
+      console.log('🎨 Starting handwriting generation...', request);
       
-      // Step 3: Extract style
-      const styleData = await this.extractHandwritingStyle(request.style);
+      // Find the font family from our collections
+      const allFonts = [
+        ...FONT_COLLECTIONS.free.cursive,
+        ...FONT_COLLECTIONS.free.printed,
+        ...FONT_COLLECTIONS.premium.cursive,
+        ...FONT_COLLECTIONS.premium.printed
+      ];
       
-      // Step 4: Generate handwriting
-      const handwritingImage = await this.generateHandwritingImage(request.text, styleData.styleVector);
+      const selectedFont = allFonts.find(font => font.id === request.style);
+      const fontFamily = selectedFont ? selectedFont.family : 'Roboto';
       
-      // Step 5: Place on background
-      const finalImage = await this.placeOnBackground(handwritingImage, request.background);
+      // Generate the handwriting image
+      const imageUrl = await this.generateHandwritingCanvas(
+        request.text,
+        fontFamily,
+        request.background || 'lined',
+        request.fontSize || 24
+      );
       
       const processingTime = Date.now() - startTime;
+      console.log(`✅ Generation completed in ${processingTime}ms`);
       
       return {
-        imageUrl: finalImage,
+        imageUrl,
         processingTime,
         success: true
       };
     } catch (error) {
-      console.error('Handwriting generation failed:', error);
+      console.error('❌ Handwriting generation failed:', error);
       return {
         imageUrl: '',
         processingTime: Date.now() - startTime,
         success: false
       };
+    }
+  }
+
+  // Export functionality
+  async exportImage(imageUrl: string, format: 'png' | 'jpg' | 'pdf', isPremium: boolean = false): Promise<void> {
+    if (format === 'pdf' && !isPremium) {
+      throw new Error('PDF export is a premium feature');
+    }
+
+    if (format === 'pdf') {
+      // For PDF export (premium only)
+      const { jsPDF } = await import('jspdf');
+      const pdf = new jsPDF();
+      
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 10, 10, 190, 0);
+          pdf.save('handwriting.pdf');
+        }
+      };
+      img.src = imageUrl;
+    } else {
+      // For PNG/JPG export
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = `handwriting.${format}`;
+      link.click();
     }
   }
 }
